@@ -3,6 +3,7 @@ Parse trees for genetic programming.
 """
 
 import random
+import math
 
 
 class ParseTree:
@@ -62,7 +63,7 @@ class ParseTree:
             terminal_rules (TerminalGenerationRules): The rules for generating
                 terminals, a set of literals, and a range for generating random
                 constants.
-            depth (int): The maximium depth of the tree. Expected to be 1 or greater
+            depth (int): The maximum depth of the tree. Expected to be 1 or greater
             terminal_prob (float): The probability of a node being a terminal node.
                 Expected to be between 0 and 1.
 
@@ -74,6 +75,19 @@ class ParseTree:
                 function_set, terminal_rules, depth, terminal_prob
             )
         )
+
+    def evaluate(self, variable_values: dict[str, float]) -> float:
+        """
+        Evaluates the expression represented by the parse tree.
+
+        Args:
+            variable_values (dict[str, float]): A dictionary mapping variables
+                to their values.
+
+        Returns:
+            float: The value of the expression.
+        """
+        return self.root.evaluate(variable_values)
 
 
 class ParseNode:
@@ -155,7 +169,7 @@ class FunctionNode(ParseNode):
             terminal_rules (TerminalGenerationRules): The rules for generating
                 terminals, a set of literals, and a range for generating random
                 constants.
-            depth (int): The maximium depth of the tree. Expected to be 1 or greater
+            depth (int): The maximum depth of the tree. Expected to be 1 or greater
             terminal_prob (float): The probability of a node being a terminal node.
                 Expected to be between 0 and 1. A probability of 0 guarantees
                 the subtree to be full.
@@ -182,6 +196,47 @@ class FunctionNode(ParseNode):
                 )
         out.children = children
         return out
+
+    def evaluate(self, variable_values: dict[str, float]) -> float:
+        """
+        Evaluates the expression represented by the parse tree.
+
+        A few safeguard are added to prevent errors during evaluation:
+        - If this would divide by zero, returns 1.0 instead (protected division).
+        - If the logarithm is negative or zero, returns -1.0 instead.
+        - "exp" is currently not protected against overflow errors.
+
+        Args:
+            variable_values (dict[str, float]): A dictionary mapping variables
+                to their values.
+
+        Returns:
+            float: The value of the expression.
+        """
+        eval_children = [child.evaluate(variable_values) for child in self.children]
+        match self.value:
+            case "+":
+                return eval_children[0] + eval_children[1]
+            case "-":
+                return eval_children[0] - eval_children[1]
+            case "*":
+                return eval_children[0] * eval_children[1]
+            case "/":
+                # Protected division
+                if eval_children[1] == 0:
+                    return 1.0
+                return eval_children[0] / eval_children[1]
+            case "sin":
+                return math.sin(eval_children[0])
+            case "cos":
+                return math.cos(eval_children[0])
+            case "exp":
+                # TODO: can cause overflow errors if the exponent is too large
+                return math.exp(eval_children[0])
+            case "ln":
+                if eval_children[0] <= 0:
+                    return -1.0
+                return math.log(eval_children[0])
 
 
 class TerminalNode(ParseNode):
@@ -230,6 +285,26 @@ class TerminalNode(ParseNode):
         else:
             const = round(const, rules.decimal_places)
         return TerminalNode(str(const))
+
+    def evaluate(self, variable_values: dict[str, float]) -> float:
+        """
+        Evaluates the terminal node as a float. Directly converts constants to
+        floats, maps variables (e.g. "X", "Y") to floats based on the given
+        dictionary.
+
+        Args:
+            variable_values (dict[str, float]): A dictionary mapping variables
+                to their values.
+
+        Returns:
+            float: The value of the terminal node.
+        """
+        if self.value in variable_values:
+            return variable_values[self.value]
+        try:
+            return float(self.value)
+        except ValueError:
+            raise ValueError(f"Invalid terminal value: {self.value}")
 
 
 class TerminalGenerationRules:
