@@ -26,27 +26,29 @@ class ParseTree:
 
     @staticmethod
     def generate_full(
-        function_set: list[str], terminal_set: list[str], depth: int
+        function_set: list[str], terminal_rules: "TerminalGenerationRules", depth: int
     ) -> "ParseTree":
         """
         Generates a full parse tree of a given depth.
 
         Args:
             function_set (list[str]): The set of functions to use.
-            terminal_set (list[str]): The set of terminals to use.
+            terminal_rules (TerminalGenerationRules): The rules for generating
+                terminals, a set of literals, and a range for generating random
+                constants.
             depth (int): The depth of the tree. Expected to be 1 or greater
 
         Returns:
             ParseTree: A full parse tree with the given depth.
         """
         return ParseTree(
-            FunctionNode.from_function_set(function_set, terminal_set, depth, 0.0)
+            FunctionNode.from_function_set(function_set, terminal_rules, depth, 0.0)
         )
 
     @staticmethod
     def generate_grow(
         function_set: list[str],
-        terminal_set: list[str],
+        terminal_rules: "TerminalGenerationRules",
         depth: int,
         terminal_prob: float,
     ) -> "ParseTree":
@@ -57,7 +59,9 @@ class ParseTree:
 
         Args:
             function_set (list[str]): The set of functions to use.
-            terminal_set (list[str]): The set of terminals to use.
+            terminal_rules (TerminalGenerationRules): The rules for generating
+                terminals, a set of literals, and a range for generating random
+                constants.
             depth (int): The maximium depth of the tree. Expected to be 1 or greater
             terminal_prob (float): The probability of a node being a terminal node.
                 Expected to be between 0 and 1.
@@ -67,7 +71,7 @@ class ParseTree:
         """
         return ParseTree(
             FunctionNode.from_function_set(
-                function_set, terminal_set, depth, terminal_prob
+                function_set, terminal_rules, depth, terminal_prob
             )
         )
 
@@ -138,7 +142,7 @@ class FunctionNode(ParseNode):
     @staticmethod
     def from_function_set(
         function_set: list[str],
-        terminal_set: list[str],
+        terminal_rules: "TerminalGenerationRules",
         depth: int,
         terminal_prob: float,
     ) -> "FunctionNode":
@@ -148,7 +152,9 @@ class FunctionNode(ParseNode):
 
         Args:
             function_set (list[str]): The set of functions to use.
-            terminal_set (list[str]): The set of terminals to use.
+            terminal_rules (TerminalGenerationRules): The rules for generating
+                terminals, a set of literals, and a range for generating random
+                constants.
             depth (int): The maximium depth of the tree. Expected to be 1 or greater
             terminal_prob (float): The probability of a node being a terminal node.
                 Expected to be between 0 and 1. A probability of 0 guarantees
@@ -166,12 +172,12 @@ class FunctionNode(ParseNode):
         for _ in range(out.arity):
             if depth <= 1 or random.random() < terminal_prob:
                 # Terminal
-                children.append(TerminalNode.from_terminal_set(terminal_set))
+                children.append(TerminalNode.from_terminal_set(terminal_rules))
             else:
                 # Function
                 children.append(
                     FunctionNode.from_function_set(
-                        function_set, terminal_set, depth - 1, terminal_prob
+                        function_set, terminal_rules, depth - 1, terminal_prob
                     )
                 )
         out.children = children
@@ -179,6 +185,10 @@ class FunctionNode(ParseNode):
 
 
 class TerminalNode(ParseNode):
+    """
+    A terminal node in the parse tree. Either a variable or a randomly
+    generated constant.
+    """
 
     def __repr__(self):
         """
@@ -188,5 +198,67 @@ class TerminalNode(ParseNode):
         return self.value
 
     @staticmethod
-    def from_terminal_set(terminal_set: list[str]) -> "TerminalNode":
-        return TerminalNode(random.choice(terminal_set))
+    def from_terminal_set(rules: "TerminalGenerationRules") -> "TerminalNode":
+        """
+        Randomly generates a terminal node based on the given rules. Each
+        literal has the same chance of being chosen as generating a random
+        constant. For example, if the literals are ["X", "Y"], there is a 1/3
+        chance of choosing "X", 1/3 chance of choosing "Y", and 1/3 chance of
+        generating a random constant.
+
+        If only the `ints_only` flag is set to True, the generated constant is
+        simply truncated to an integer.
+
+        Args:
+            rules (TerminalGenerationRules): The rules for generating terminals,
+                a set of literals, and a range for generating random constants.
+
+        Returns:
+            TerminalNode: The generated terminal node.
+        """
+        options = len(rules.literals)
+        if rules.no_random_constants:
+            options -= 1
+        res = random.randint(0, options)
+        if res < len(rules.literals):
+            # Literal
+            return TerminalNode(rules.literals[res])
+        # Random constant
+        const = random.uniform(rules.constants_range[0], rules.constants_range[1])
+        if rules.ints_only:
+            const = int(const)
+        else:
+            const = round(const, rules.decimal_places)
+        return TerminalNode(str(const))
+
+
+class TerminalGenerationRules:
+    """
+    Rules for generating terminal nodes in the parse tree. Terminal nodes will
+    either randomly select from the given literals or generate a random constant.
+
+    Args:
+        literals (list[str]): The set of literals to use.
+        constants_range (tuple[float, float]): The minimum and maximum for
+            generating random constants.
+        decimal_places (int): Defaults to 4. The number of decimal places for
+            the random constants.
+        ints_only (bool): Defaults to False. If True, the generated constants
+            will only be integers.
+        no_random_constants (bool): Defaults to False. If True, terminals will
+            only be chosen from literals.
+    """
+
+    def __init__(
+        self,
+        literals: list[str],
+        constants_range: tuple[float, float],
+        decimal_places: int = 4,
+        ints_only: bool = False,
+        no_random_constants: bool = False,
+    ):
+        self.literals = literals
+        self.constants_range = constants_range
+        self.decimal_places = decimal_places
+        self.ints_only = ints_only
+        self.no_random_constants = no_random_constants
