@@ -89,6 +89,19 @@ class ParseTree:
         """
         return self.root.evaluate(variable_values)
 
+    def get_random_node(self):
+        nodes = []
+
+        def recurse(current, parent):
+            if parent is not None:
+                nodes.append((current, parent))
+            if isinstance(current, FunctionNode):
+                for child in current.children:
+                    recurse(child, current)
+
+        recurse(self.root, None)
+        return random.choice(nodes)
+
 
 class ParseNode:
     """
