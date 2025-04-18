@@ -25,6 +25,19 @@ class ParseTree:
         """
         return repr(self.root)
 
+    def pretty_print(self):
+        def recurse(node, prefix="", is_tail=True):
+            result = prefix + ("└── " if is_tail else "├── ") + str(node.value) + "\n"
+            if isinstance(node, FunctionNode):
+                for i, child in enumerate(node.children):
+                    is_last = i == (len(node.children) - 1)
+                    result += recurse(
+                        child, prefix + ("    " if is_tail else "│   "), is_last
+                    )
+            return result
+
+        return recurse(self.root)
+
     @staticmethod
     def generate_full(
         function_set: list[str], terminal_rules: "TerminalGenerationRules", depth: int
