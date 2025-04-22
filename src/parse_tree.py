@@ -40,7 +40,14 @@ class ParseTree:
         """
         return repr(self.root)
 
-    def pretty_print(self):
+    def pretty_print(self) -> str:
+        """
+        Prints the parse tree in a tree-like format that is more easily readable.
+
+        Returns:
+            str: The parse tree in a tree-like format.
+        """
+
         def recurse(node, prefix="", is_tail=True):
             result = prefix + ("└── " if is_tail else "├── ") + str(node.value) + "\n"
             if isinstance(node, FunctionNode):
@@ -119,7 +126,18 @@ class ParseTree:
 
     def get_random_node(
         self, node_type: str = "any"
-    ) -> tuple[ParseNode, ParseNode | None]:
+    ) -> tuple["ParseNode", "ParseNode" | None]:
+        """
+        Returns a random node from the parse tree. The node should be of the type specified in node_type.
+        The parent of the node is also returned. If the node is the root, the parent is None.
+        Args:
+            node_type (str): The type of node to return. Can be "any", "leaf", or "internal".
+                - "any": Any node (default).
+                - "leaf": A terminal node.
+                - "internal": A function node.
+        Returns:
+            tuple[ParseNode, ParseNode | None]: A tuple containing the random node and its parent.
+        """
         nodes = []
 
         def recurse(current, parent):
