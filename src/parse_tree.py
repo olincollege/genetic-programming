@@ -6,6 +6,21 @@ import random
 import math
 
 
+class ParseNode:
+    """
+    A node in the parse tree. Can be a function or a terminal.
+
+    Attributes:
+        value (str): The value of the node, either a function or a terminal.
+    """
+
+    def __init__(self, value):
+        self.value: str = value
+
+    def __repr__(self):
+        pass
+
+
 class ParseTree:
     """
     A parse tree, representing a mathematical expression in a tree structure.
@@ -102,33 +117,25 @@ class ParseTree:
         """
         return self.root.evaluate(variable_values)
 
-    def get_random_node(self):
+    def get_random_node(
+        self, node_type: str = "any"
+    ) -> tuple[ParseNode, ParseNode | None]:
         nodes = []
 
         def recurse(current, parent):
             if parent is not None:
-                nodes.append((current, parent))
+                if node_type == "any":
+                    nodes.append((current, parent))
+                elif node_type == "leaf" and isinstance(current, TerminalNode):
+                    nodes.append((current, parent))
+                elif node_type == "internal" and isinstance(current, FunctionNode):
+                    nodes.append((current, parent))
             if isinstance(current, FunctionNode):
                 for child in current.children:
                     recurse(child, current)
 
         recurse(self.root, None)
         return random.choice(nodes)
-
-
-class ParseNode:
-    """
-    A node in the parse tree. Can be a function or a terminal.
-
-    Attributes:
-        value (str): The value of the node, either a function or a terminal.
-    """
-
-    def __init__(self, value):
-        self.value: str = value
-
-    def __repr__(self):
-        pass
 
 
 class FunctionNode(ParseNode):
