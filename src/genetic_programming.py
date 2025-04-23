@@ -32,7 +32,7 @@ class IrisGP:
         self.terminal_prob = terminal_prob
 
     @staticmethod
-    def evaluate_fitness(self, individual: ParseTree, train_df: pd.DataFrame) -> int:
+    def evaluate_fitness(individual: ParseTree, train_df: pd.DataFrame) -> int:
         """
         Evaluates the fitness of an individual (parse tree) by the number of
         correctly classified rows in the training dataset.
@@ -45,10 +45,12 @@ class IrisGP:
         """
         fitness = 0
         for _, row in train_df.iterrows():
-            fitness += self.evaluate_row(individual, row)
+            correctness, _ = IrisGP.evaluate_row(individual, row)
+            fitness += correctness
         return fitness
 
-    def evaluate_row(self, individual: ParseTree, row: pd.Series, threshold=0.5) -> int:
+    @staticmethod
+    def evaluate_row(individual: ParseTree, row: pd.Series, threshold=0.5) -> int:
         """
         Checks if the individual (parse tree) classifies a row correctly.
 
@@ -66,13 +68,15 @@ class IrisGP:
                 various measurements of an iris flower.
             threshold (float): The threshold value for classification. Defaults to 0.5.
 
-        Returns (int): 1 if the classification is correct, 0 otherwise.
+        Returns (tuple):
+            bool: True if the classification is correct, False otherwise.
+            float: The output of the parse tree for the given row.
         """
         res = individual.evaluate(dict(row))
         if (res < threshold) == (row["Species"] == "Iris-setosa"):
-            return 1
+            return True, res
         else:
-            return 0
+            return False, res
 
     def generate_population(self, population_size: int) -> list[ParseTree]:
         """
@@ -116,7 +120,7 @@ class IrisGP:
         generations: int,
         crossover_rate: float,
         mutation_rate: float,
-        num_parents_to_survive: int,  # number of parents that move on to the generation
+        num_parents_to_survive: int,
         train_df: pd.DataFrame,
     ) -> tuple[ParseTree, float, list[float]]:
         """
@@ -138,45 +142,24 @@ class IrisGP:
             - fitness_history (list[float]): A history of fitness scores over generations.
         """
 
-        class FitnessCache:
-            """
-            Stores fitness scores of individuals to avoid recalculating.
-            """
-
-            def __init__(self):
-                # Initialize None to -inf so a best individual of None is always overridden
-                self.map = {None: float("-inf")}
-
-            def __getitem__(self, key: ParseTree) -> float:
-                """
-                Returns the fitness score for a given individual.
-                Evaluates the fitness if not already calculated.
-
-                Args:
-                    key (list): The schedule to evaluate
-
-                Returns (float): The fitness score of the individual
-                """
-                if key not in self.map:
-                    self.map[key] = IrisGP.evaluate_fitness(key, train_df)
-                return self.map[key]
-
         population = self.generate_population(population_size)
         best_individual = None
         fitness_history = []
-        fitness_cache = FitnessCache()
+        fitness_cache = FitnessCache(train_df)
 
         for _ in range(generations):
-            parents: list[ParseTree]  # select `num_parents_to_survive` best parents
+            parents: list[ParseTree] = sorted(
+                population, key=lambda x: fitness_cache[x], reverse=True
+            )[:num_parents_to_survive]
             offspring: list[ParseTree] = []
 
             for _ in range(population_size - num_parents_to_survive):
                 # Spawn children
-                parent1, parent2 = self.select_parents(population)
-                child = GeneticOperators.crossover(
+                parent1, parent2 = self.select_parents(population, fitness_cache)
+                child1, child2 = GeneticOperators.crossover(
                     parent1, parent2
                 )  # TODO: factor in crossover rate
-                offspring.append(child)
+                offspring.append(child1)
 
             population = parents + offspring
 
@@ -203,3 +186,33 @@ class IrisGP:
                     break
 
         return best_individual, fitness_cache[best_individual], fitness_history
+
+
+class FitnessCache:
+    """
+    Stores fitness scores of individuals to avoid recalculating.
+
+    Attributes:
+        map (dict): A dictionary mapping individuals to their fitness scores.
+        train_df (pd.DataFrame): The training dataset used for fitness evaluation.
+    """
+
+    def __init__(self, train_df: pd.DataFrame):
+
+        # Initialize None to -inf so a best individual of None is always overridden
+        self.map = {None: float("-inf")}
+        self.train_df = train_df
+
+    def __getitem__(self, key: ParseTree) -> float:
+        """
+        Returns the fitness score for a given individual.
+        Evaluates the fitness if not already calculated.
+
+        Args:
+            key (list): The schedule to evaluate
+
+        Returns (float): The fitness score of the individual
+        """
+        if key not in self.map:
+            self.map[key] = IrisGP.evaluate_fitness(key, self.train_df)
+        return self.map[key]
