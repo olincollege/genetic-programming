@@ -31,12 +31,9 @@ class GeneticProgramming:
         THRESHOLD = 0.5
 
         res = individual.evaluate(dict(row))
-        # print(res, row["Species"], end=" ")
         if (res < THRESHOLD) == (row["Species"] == "Iris-setosa"):
-            # print("1")
             return 1
         else:
-            # print("0")
             return 0
 
     def generate_population(self, population_size: int) -> list[ParseTree]:
@@ -52,12 +49,20 @@ class GeneticProgramming:
         ]
 
     def select_parents(
-        self, population: list[ParseTree]
+        self, population: list[ParseTree], fitness_cache: dict[ParseTree, float]
     ) -> tuple[ParseTree, ParseTree]:
         """
-        Roulette wheel parent selection
+        Select two parents via roulette wheel parent selection. Parents are
+        randomly selected with probability proportional to their fitness.
+
+        Args:
+            population (list): The current population of individuals.
+            fitness_cache (FitnessCache): A cache of fitness scores for the individuals.
+
+        Returns (tuple): A tuple of two selected parents.
         """
-        pass
+        fitnesses = [fitness_cache[i] for i in population]
+        return random.choices(population, weights=fitnesses, k=2)
 
     def solve(
         self,
