@@ -50,14 +50,17 @@ class IrisGP:
         return fitness
 
     @staticmethod
-    def evaluate_row(individual: ParseTree, row: pd.Series, threshold=0.5) -> int:
+    def evaluate_row(
+        individual: ParseTree, row: pd.Series, t1=0.33, t2=0.66
+    ) -> tuple[bool, float]:
         """
         Checks if the individual (parse tree) classifies a row correctly.
 
         The classification is based on comparing the output of the parse tree
         to a threshold value:
-            output < threshold --> Iris setosa
-            output >= threshold --> Iris virginica
+            res < t1     --> Iris-setosa
+            t1 <= res < t2 --> Iris-versicolor
+            res >= t2    --> Iris-virginica
 
         This function assumes the variables in the parse tree have the same
         names as the columns in the row.
@@ -66,17 +69,23 @@ class IrisGP:
             individual (ParseTree): The parse tree to evaluate.
             row (pd.Series): A row of the training dataset, representing
                 various measurements of an iris flower.
-            threshold (float): The threshold value for classification. Defaults to 0.5.
+            t1 (float): The threshold value for classification. Defaults to 0.33.
+            t2 (float): The threshold value for classification. Defaults to 0.66.
 
         Returns (tuple):
             bool: True if the classification is correct, False otherwise.
             float: The output of the parse tree for the given row.
         """
         res = individual.evaluate(dict(row))
-        if (res < threshold) == (row["Species"] == "Iris-setosa"):
-            return True, res
+        if res < t1:
+            predicted = "Iris-setosa"
+        elif res < t2:
+            predicted = "Iris-versicolor"
         else:
-            return False, res
+            predicted = "Iris-virginica"
+
+        correct = predicted == row["Species"]
+        return correct, res
 
     def generate_population(self, population_size: int) -> list[ParseTree]:
         """
