@@ -5,7 +5,20 @@ import random
 from copy import deepcopy
 
 
-class GeneticProgramming:
+class IrisGP:
+    """
+    Classifier for the Iris dataset using Genetic Programming.
+
+    Attributes:
+        function_set (list[str]): The set of functions for parse trees to use.
+        terminal_rules (TerminalGenerationRules): The rules for generating
+            terminals, a set of literals, and a range for generating random
+            constants.
+        depth (int): The maximum depth of the tree. Expected to be 1 or greater
+        terminal_prob (float): The probability of a node being a terminal node.
+            Expected to be between 0 and 1.
+    """
+
     def __init__(
         self,
         function_set: list,
@@ -20,23 +33,56 @@ class GeneticProgramming:
 
     @staticmethod
     def evaluate_fitness(self, individual: ParseTree, train_df: pd.DataFrame) -> int:
+        """
+        Evaluates the fitness of an individual (parse tree) by the number of
+        correctly classified rows in the training dataset.
+
+        Args:
+            individual (ParseTree): The parse tree to evaluate.
+            train_df (pd.DataFrame): The training Iris dataset.
+
+        Returns (int): The fitness score of the individual.
+        """
         fitness = 0
         for _, row in train_df.iterrows():
             fitness += self.evaluate_row(individual, row)
         return fitness
 
-    def evaluate_row(self, individual: ParseTree, row: pd.Series) -> int:
-        # < THRESHOLD --> setosa
-        # >= THRESHOLD --> viriginica
-        THRESHOLD = 0.5
+    def evaluate_row(self, individual: ParseTree, row: pd.Series, threshold=0.5) -> int:
+        """
+        Checks if the individual (parse tree) classifies a row correctly.
 
+        The classification is based on comparing the output of the parse tree
+        to a threshold value:
+            output < threshold --> Iris setosa
+            output >= threshold --> Iris virginica
+
+        This function assumes the variables in the parse tree have the same
+        names as the columns in the row.
+
+        Args:
+            individual (ParseTree): The parse tree to evaluate.
+            row (pd.Series): A row of the training dataset, representing
+                various measurements of an iris flower.
+            threshold (float): The threshold value for classification. Defaults to 0.5.
+
+        Returns (int): 1 if the classification is correct, 0 otherwise.
+        """
         res = individual.evaluate(dict(row))
-        if (res < THRESHOLD) == (row["Species"] == "Iris-setosa"):
+        if (res < threshold) == (row["Species"] == "Iris-setosa"):
             return 1
         else:
             return 0
 
     def generate_population(self, population_size: int) -> list[ParseTree]:
+        """
+        Generates an initial population of parse trees.
+
+        Args:
+            population_size (int): The size of the population to generate.
+
+        Returns (list[ParseTree]): A list of randomly generated parse trees.
+        """
         # TODO: make optional grow vs full
         return [
             ParseTree.generate_grow(
@@ -73,6 +119,25 @@ class GeneticProgramming:
         num_parents_to_survive: int,  # number of parents that move on to the generation
         train_df: pd.DataFrame,
     ) -> tuple[ParseTree, float, list[float]]:
+        """
+        Perform genetic programming, evolving a parse tree to classify the Iris
+        dataset.
+
+        Args:
+            population_size (int): The number of individuals in the population.
+            generations (int): The max number of generations to evolve for.
+            crossover_rate (float): The probability of crossover between parents.
+            mutation_rate (float): The probability of mutation in the offspring.
+            num_parents_to_survive (int): The number of parents that move on to
+                the next generation.
+            train_df (pd.DataFrame): The portion of the dataset for training.
+
+        Returns (tuple):
+            - best_individual (ParseTree): The best parse tree found.
+            - best_fitness (float): The fitness score of the best individual.
+            - fitness_history (list[float]): A history of fitness scores over generations.
+        """
+
         class FitnessCache:
             """
             Stores fitness scores of individuals to avoid recalculating.
@@ -93,7 +158,7 @@ class GeneticProgramming:
                 Returns (float): The fitness score of the individual
                 """
                 if key not in self.map:
-                    self.map[key] = GeneticProgramming.evaluate_fitness(key, train_df)
+                    self.map[key] = IrisGP.evaluate_fitness(key, train_df)
                 return self.map[key]
 
         population = self.generate_population(population_size)
