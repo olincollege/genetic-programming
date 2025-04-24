@@ -173,7 +173,7 @@ class IrisGP:
                 parent1, parent2 = self.select_parents(population, fitness_cache)
                 if random.random() < crossover_rate:
                     # `crossover_rate` is the probability of crossover
-                    child = GeneticOperators.crossover(parent1, parent2)
+                    child, _ = GeneticOperators.crossover(parent1, parent2)
                     offspring.append(child)
                 else:
                     # If no crossover, just clone one of the parents
