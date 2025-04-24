@@ -132,7 +132,7 @@ class IrisGP:
         generations: int,
         crossover_rate: float,
         mutation_rate: float,
-        num_parents_to_survive: int,
+        num_champions_to_survive: int,
         train_df: pd.DataFrame,
     ) -> tuple[ParseTree, float, list[float]]:
         """
@@ -142,10 +142,12 @@ class IrisGP:
         Args:
             population_size (int): The number of individuals in the population.
             generations (int): The max number of generations to evolve for.
-            crossover_rate (float): The probability of crossover between parents.
-            mutation_rate (float): The probability of mutation in the offspring.
-            num_parents_to_survive (int): The number of parents that move on to
-                the next generation.
+            crossover_rate (float): The probability of crossover between parents
+                from zero to one.
+            mutation_rate (float): The probability of mutation in the offspring
+                from zero to one.
+            num_champions_to_survive (int): The number of best performing
+                individuals that move onto the next generation.
             train_df (pd.DataFrame): The portion of the dataset for training.
 
         Returns (tuple):
@@ -160,29 +162,36 @@ class IrisGP:
         fitness_cache = FitnessCache(train_df)
 
         for _ in range(generations):
-            parents: list[ParseTree] = sorted(
+            # Let n best individuals survive to the next generation as parents
+            champions: list[ParseTree] = sorted(
                 population, key=lambda x: fitness_cache[x], reverse=True
-            )[:num_parents_to_survive]
+            )[:num_champions_to_survive]
             offspring: list[ParseTree] = []
 
-            for _ in range(population_size - num_parents_to_survive):
+            for _ in range(population_size - num_champions_to_survive):
                 # Spawn children
                 parent1, parent2 = self.select_parents(population, fitness_cache)
-                child1, child2 = GeneticOperators.crossover(
-                    parent1, parent2
-                )  # TODO: factor in crossover rate
-                offspring.append(child1)
+                if random.random() < crossover_rate:
+                    # `crossover_rate` is the probability of crossover
+                    child = GeneticOperators.crossover(parent1, parent2)
+                    offspring.append(child)
+                else:
+                    # If no crossover, just clone one of the parents
+                    offspring.append(deepcopy(parent1))
 
-            population = parents + offspring
+            population = champions + offspring
 
             # Mutate the population
             for idx, individual in enumerate(population):
+                # `mutation_rate` chance to mutate each individual
+                if random.random() > mutation_rate:
+                    continue
                 population[idx] = GeneticOperators.subtree_mutation(
                     individual,
                     self.function_set,
                     self.terminal_rules,
                     self.max_depth,
-                )  # TODO: factor in mutation rate
+                )
 
             # Update History
             fitness_history.append(
