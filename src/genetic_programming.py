@@ -191,6 +191,7 @@ class IrisGP:
                     self.function_set,
                     self.terminal_rules,
                     self.max_depth,
+                    self.terminal_prob,
                 )
 
             # Update History
@@ -250,6 +251,7 @@ class GeneticOperators:
         function_set: list[str],
         terminal_rules: "TerminalGenerationRules",
         max_depth: int,
+        terminal_prob: float,
     ) -> "ParseTree":
         """
         Replace a random subtree in the tree with a new subtree generated from the function set.
@@ -259,6 +261,8 @@ class GeneticOperators:
             function_set (list): The set of functions to use for mutation.
             terminal_rules (TerminalGenerationRules): The rules for generating terminal nodes.
             max_depth (int): The maximum depth of the new subtree.
+            terminal_prob (float): The probability of a node being a terminal
+                node when generating a new subtree.
 
         Returns:
             ParseTree: The mutated parse tree.
