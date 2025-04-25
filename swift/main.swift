@@ -955,3 +955,29 @@ extension GeneticProgramming {
         return results
     }
 }
+
+// MARK: - Benchmark Results Storage
+
+struct BenchmarkResult: Codable {
+    let parameter: String
+    let value: Int
+    let time: Double
+    let accuracy: Double
+}
+
+func saveResultsToCSV(results: [BenchmarkResult], filename: String) {
+    // Create CSV content
+    var csvContent = "parameter,value,time,accuracy\n"
+    
+    for result in results {
+        csvContent += "\(result.parameter),\(result.value),\(result.time),\(result.accuracy)\n"
+    }
+    
+    // Save to file
+    do {
+        try csvContent.write(toFile: filename, atomically: true, encoding: .utf8)
+        print("Results saved to \(filename)")
+    } catch {
+        print("Error saving results: \(error.localizedDescription)")
+    }
+}
