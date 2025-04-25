@@ -890,63 +890,6 @@ class GeneticProgramming {
     }
 }
 
-// MARK: - Main Execution
-
-// 1. Load the dataset
-let dataset = loadIrisDataset()
-let (features, labels) = dataset.getDataArrays()
-
-// 2. Setup genetic programming parameters
-let functionSet = ["+", "-", "*", "/"] // Could add "sin", "cos", etc.
-let terminalRules = TerminalGenerationRules(
-    literals: dataset.getFeatureNames(),
-    constantsRange: (-10, 10),
-    intsOnly: false,
-    noRandomConstants: false
-)
-
-// 3. Create and run genetic programming algorithm
-let gp = GeneticProgramming(
-    functionSet: functionSet,
-    terminalRules: terminalRules,
-    populationSize: 100,
-    maxGenerations: 50,
-    crossoverRate: 0.9,
-    mutationRate: 0.1
-)
-
-// 4. Create train/test split
-let (trainData, testData) = dataset.splitData(trainRatio: 0.7)
-let (trainFeatures, trainLabels) = (
-    trainData.map { sample in 
-        [sample.features.sepalLength, sample.features.sepalWidth, 
-         sample.features.petalLength, sample.features.petalWidth] 
-    },
-    trainData.map { $0.speciesIndex }
-)
-let (testFeatures, testLabels) = (
-    testData.map { sample in 
-        [sample.features.sepalLength, sample.features.sepalWidth, 
-         sample.features.petalLength, sample.features.petalWidth] 
-    },
-    testData.map { $0.speciesIndex }
-)
-
-// 5. Train multi-class classifier
-print("Training multi-class classifier...")
-let classifiers = gp.solveMultiClass(data: trainFeatures, labels: trainLabels)
-
-// 6. Test classifier
-print("\nTesting classifier on test data...")
-let accuracy = gp.testMultiClass(classifiers: classifiers, testData: testFeatures, testLabels: testLabels)
-
-// 7. Output best solutions
-print("\nBest solutions for each class:")
-for (i, tree) in classifiers.enumerated() {
-    print("\nClass \(i) classifier:")
-    print(tree)
-}
-
 // MARK: - Benchmarking Extension
 
 extension GeneticProgramming {
