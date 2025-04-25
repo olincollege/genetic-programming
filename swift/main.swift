@@ -850,7 +850,9 @@ let gp = GeneticProgramming(
     functionSet: functionSet,
     terminalRules: terminalRules,
     populationSize: 100,
-    maxGenerations: 50
+    maxGenerations: 50,
+    crossoverRate: 0.9,
+    mutationRate: 0.1
 )
 
 // 4. Implement missing methods:
