@@ -91,3 +91,7 @@ class Visualizations:
             display_labels=["Iris-setosa", "Iris-versicolor", "Iris-virginica"],
         )
         disp.plot(cmap=plt.cm.RdPu)
+        plt.xlabel("Predicted Species")
+        plt.ylabel("Actual Species")
+        plt.title("GP Predicted Species Confusion Matrix")
+        plt.show()
