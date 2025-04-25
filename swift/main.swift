@@ -773,53 +773,36 @@ class GeneticProgramming {
             population = newPopulation
         }
         
-        // Return the best individual from the final population
-        let finalFitnesses = population.map { fitnessFunction(individual: $0, data: data, labels: labels) }
-        let bestIndex = finalFitnesses.indices.max(by: { finalFitnesses[$0] < finalFitnesses[$1] }) ?? 0
-        
-        return population[bestIndex]
-    }
-}
-
-// MARK: - Fitness Function for Iris Classification
-
-extension GeneticProgramming {
-    // Binary classification fitness function (one species vs others)
-    func binaryFitness(individual: ParseTree, data: [[Double]], labels: [Int], targetClass: Int) -> Double {
-        var correctCount = 0
-        
-        for i in 0..<data.count {
-            let features = data[i]
-            let actualLabel = labels[i]
-            
-            // Create variable values mapping
-            var variableValues: [String: Double] = [:]
-            for j in 0..<features.count {
-                variableValues["X\(j+1)"] = features[j]
-            }
-            
-            // Evaluate the tree to get the predicted value
-            let predictedValue = individual.evaluate(variableValues: variableValues)
-            
-            // For binary classification:
-            // If predictedValue > 0, predict targetClass, else predict other class
-            let predictedClass = predictedValue > 0 ? targetClass : (targetClass == 0 ? 1 : 0)
-            
-            if predictedClass == actualLabel {
-                correctCount += 1
-            }
-        }
-        
-        return Double(correctCount) / Double(data.count)
+        // Return the best individual found during evolution
+        return bestIndividual ?? population[0]
     }
     
     // Multi-class classification using "one-vs-all" approach with multiple trees
-    func multiClassFitness(individuals: [ParseTree], data: [[Double]], labels: [Int]) -> Double {
+    func solveMultiClass(data: [[Double]], labels: [Int], numClasses: Int = 3) -> [ParseTree] {
+        var classifiers: [ParseTree] = []
+        
+        // Train one classifier per class
+        for classIndex in 0..<numClasses {
+            print("\nTraining classifier for class \(classIndex)")
+            let classifier = evolve(data: data, labels: labels, targetClass: classIndex)
+            classifiers.append(classifier)
+            print("Best fitness for class \(classIndex): \(bestFitness)")
+            
+            // Reset for next class
+            bestFitness = 0.0
+            bestIndividual = nil
+        }
+        
+        return classifiers
+    }
+    
+    // Test multi-class classification accuracy
+    func testMultiClass(classifiers: [ParseTree], testData: [[Double]], testLabels: [Int]) -> Double {
         var correctCount = 0
         
-        for i in 0..<data.count {
-            let features = data[i]
-            let actualLabel = labels[i]
+        for i in 0..<testData.count {
+            let features = testData[i]
+            let actualLabel = testLabels[i]
             
             // Create variable values mapping
             var variableValues: [String: Double] = [:]
@@ -827,21 +810,23 @@ extension GeneticProgramming {
                 variableValues["X\(j+1)"] = features[j]
             }
             
-            // Evaluate each tree to get confidence for each class
+            // Get confidence scores from each classifier
             var confidences: [Double] = []
-            for tree in individuals {
-                confidences.append(tree.evaluate(variableValues: variableValues))
+            for classifier in classifiers {
+                confidences.append(classifier.evaluate(variableValues: variableValues))
             }
             
-            // Predict the class with highest confidence
-            let predictedClass = confidences.enumerated().max(by: { $0.element < $1.element })?.offset ?? 0
-            
-            if predictedClass == actualLabel {
-                correctCount += 1
+            // Predict class with highest confidence
+            if let maxIndex = confidences.indices.max(by: { confidences[$0] < confidences[$1] }) {
+                if maxIndex == actualLabel {
+                    correctCount += 1
+                }
             }
         }
         
-        return Double(correctCount) / Double(data.count)
+        let accuracy = Double(correctCount) / Double(testData.count)
+        print("\nTest accuracy: \(accuracy * 100)%")
+        return accuracy
     }
 }
 
