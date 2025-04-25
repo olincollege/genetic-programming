@@ -885,3 +885,73 @@ for (i, tree) in classifiers.enumerated() {
     print("\nClass \(i) classifier:")
     print(tree)
 }
+
+// MARK: - Benchmarking Extension
+
+extension GeneticProgramming {
+    // Run benchmarks with different population sizes
+    func runPopulationSizeBenchmark(sizes: [Int], trainData: [[Double]], trainLabels: [Int], testData: [[Double]], testLabels: [Int]) -> [(size: Int, time: Double, accuracy: Double)] {
+        var results: [(size: Int, time: Double, accuracy: Double)] = []
+        
+        for size in sizes {
+            print("\nRunning benchmark with population size: \(size)")
+            
+            // Create new GP instance with this population size
+            let gp = GeneticProgramming(
+                functionSet: self.functionSet,
+                terminalRules: self.terminalRules,
+                populationSize: size,
+                maxGenerations: self.maxGenerations,
+                maxDepth: self.maxDepth,
+                tournamentSize: self.tournamentSize,
+                crossoverRate: self.crossoverRate,
+                mutationRate: self.mutationRate
+            )
+            
+            let startTime = CFAbsoluteTimeGetCurrent()
+            let classifiers = gp.solveMultiClass(data: trainData, labels: trainLabels)
+            let endTime = CFAbsoluteTimeGetCurrent()
+            let executionTime = endTime - startTime
+            
+            let accuracy = gp.testMultiClass(classifiers: classifiers, testData: testData, testLabels: testLabels)
+            
+            results.append((size: size, time: executionTime, accuracy: accuracy))
+            print("Population size \(size): \(executionTime) seconds, Accuracy: \(accuracy)")
+        }
+        
+        return results
+    }
+    
+    // Run benchmarks with different generation counts
+    func runGenerationCountBenchmark(counts: [Int], trainData: [[Double]], trainLabels: [Int], testData: [[Double]], testLabels: [Int]) -> [(count: Int, time: Double, accuracy: Double)] {
+        var results: [(count: Int, time: Double, accuracy: Double)] = []
+        
+        for count in counts {
+            print("\nRunning benchmark with generation count: \(count)")
+            
+            // Create new GP instance with this generation count
+            let gp = GeneticProgramming(
+                functionSet: self.functionSet,
+                terminalRules: self.terminalRules,
+                populationSize: self.populationSize,
+                maxGenerations: count,
+                maxDepth: self.maxDepth,
+                tournamentSize: self.tournamentSize,
+                crossoverRate: self.crossoverRate,
+                mutationRate: self.mutationRate
+            )
+            
+            let startTime = CFAbsoluteTimeGetCurrent()
+            let classifiers = gp.solveMultiClass(data: trainData, labels: trainLabels)
+            let endTime = CFAbsoluteTimeGetCurrent()
+            let executionTime = endTime - startTime
+            
+            let accuracy = gp.testMultiClass(classifiers: classifiers, testData: testData, testLabels: testLabels)
+            
+            results.append((count: count, time: executionTime, accuracy: accuracy))
+            print("Generation count \(count): \(executionTime) seconds, Accuracy: \(accuracy)")
+        }
+        
+        return results
+    }
+}
