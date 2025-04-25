@@ -1,6 +1,6 @@
 import Foundation
 
-// Iris Data Structures
+// MARK: - Iris Data Structures
 
 struct IrisFeatures {
     var sepalLength: Double
@@ -15,7 +15,7 @@ struct IrisSample {
     let speciesIndex: Int // 0 = setosa, 1 = versicolor, 2 = virginica
 }
 
-// Iris Dataset Manager
+// MARK: - Iris Dataset Manager
 
 class IrisDataset {
     private(set) var samples: [IrisSample] = []
@@ -186,7 +186,7 @@ func loadIrisDataset() -> IrisDataset {
     return dataset
 }
 
-// Genetic Programming Structures
+// MARK: - Genetic Programming Structures
 
 /**
  * Rules for generating terminal nodes in a parse tree.
@@ -214,9 +214,10 @@ class TerminalGenerationRules {
 /**
  * Protocol for nodes in a parse tree.
  */
-protocol ParseNode {
+protocol ParseNode: AnyObject, CustomStringConvertible {
     var value: String { get }
     func evaluate(variableValues: [String: Double]) -> Double
+    func copy() -> ParseNode
 }
 
 /**
@@ -260,6 +261,14 @@ class TerminalNode: ParseNode {
         }
         
         fatalError("Invalid terminal value: \(value)")
+    }
+    
+    var description: String {
+        return value
+    }
+    
+    func copy() -> ParseNode {
+        return TerminalNode(value: self.value)
     }
 }
 
@@ -349,13 +358,23 @@ class FunctionNode: ParseNode {
             fatalError("Unknown function: \(value)")
         }
     }
+    
+    var description: String {
+        let args = children.map { String(describing: $0) }.joined(separator: " ")
+        return "(\(value) \(args))"
+    }
+    
+    func copy() -> ParseNode {
+        let copiedChildren = children.map { $0.copy() }
+        return FunctionNode(value: self.value, children: copiedChildren)
+    }
 }
 
 /**
  * A parse tree, representing a mathematical expression in a tree structure.
  */
-class ParseTree {
-    let root: FunctionNode
+class ParseTree: CustomStringConvertible {
+    var root: FunctionNode
     
     init(root: FunctionNode) {
         self.root = root
@@ -394,7 +413,76 @@ class ParseTree {
         return root.evaluate(variableValues: variableValues)
     }
     
-    // Extension for genetic programming operations
+    var description: String {
+        return String(describing: root)
+    }
+    
+    // Pretty print for better visualization 
+    func prettyPrint() -> String {
+        func recurse(node: ParseNode, prefix: String, isTail: Bool) -> String {
+            let prefix1 = isTail ? "└── " : "├── "
+            var result = prefix + prefix1 + node.value + "\n"
+            
+            if let functionNode = node as? FunctionNode {
+                let childCount = functionNode.children.count
+                for i in 0..<childCount {
+                    let isLast = i == childCount - 1
+                    let newPrefix = prefix + (isTail ? "    " : "│   ")
+                    result += recurse(node: functionNode.children[i], prefix: newPrefix, isTail: isLast)
+                }
+            }
+            
+            return result
+        }
+        
+        return recurse(node: root, prefix: "", isTail: true)
+    }
+    
+    // Helper function to get all nodes in the tree
+    private func getAllNodes() -> [(node: ParseNode, parent: ParseNode?)] {
+        var nodes: [(node: ParseNode, parent: ParseNode?)] = []
+        
+        func traverse(node: ParseNode, parent: ParseNode?) {
+            nodes.append((node, parent))
+            if let functionNode = node as? FunctionNode {
+                for child in functionNode.children {
+                    traverse(node: child, parent: functionNode)
+                }
+            }
+        }
+        
+        traverse(node: root, parent: nil)
+        return nodes
+    }
+    
+    // Get a random node from the tree
+    func getRandomNode(nodeType: String = "any") -> (node: ParseNode, parent: ParseNode?) {
+        let allNodes = getAllNodes()
+        var filteredNodes: [(node: ParseNode, parent: ParseNode?)] = []
+        
+        switch nodeType {
+        case "any":
+            filteredNodes = allNodes
+        case "leaf":
+            filteredNodes = allNodes.filter { $0.node is TerminalNode }
+        case "internal":
+            filteredNodes = allNodes.filter { $0.node is FunctionNode }
+        default:
+            filteredNodes = allNodes
+        }
+        
+        guard !filteredNodes.isEmpty else {
+            fatalError("No nodes of type \(nodeType) found in the tree")
+        }
+        
+        let randomIndex = Int.random(in: 0..<filteredNodes.count)
+        return filteredNodes[randomIndex]
+    }
+    
+    // Make a deep copy of the tree
+    func copy() -> ParseTree {
+        return ParseTree(root: root.copy() as! FunctionNode)
+    }
     
     // Mutation: Replace a random subtree with a new randomly generated subtree
     func mutate(
@@ -403,9 +491,14 @@ class ParseTree {
         maxDepth: Int,
         terminalProb: Double
     ) -> ParseTree {
-        // Create a deep copy of the current tree
-        // Select a random node for mutation
-        // Replace with a new randomly generated subtree
+        let mutatedTree = self.copy()
+        let (nodeToReplace, parent) = mutatedTree.getRandomNode()
+        let newSubtree = FunctionNode.fromFunctionSet(
+            functionSet: functionSet,
+            terminalRules: terminalRules,
+            depth: max(1, Int.random(in: 1...maxDepth)),
+            terminalProb: terminalProb
+        )
         
         // Placeholder - actual implementation needed
         return self
