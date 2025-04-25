@@ -606,7 +606,7 @@ class GeneticProgramming {
         
         // Create full trees for half the population
         for _ in 0..<populationSize/2 {
-            let depth = Int.random(in: 1...maxDepth)
+            let depth = Int.random(in: 2...maxDepth)
             population.append(ParseTree.generateFull(
                 functionSet: functionSet,
                 terminalRules: terminalRules, 
@@ -616,7 +616,7 @@ class GeneticProgramming {
         
         // Create grow trees for the other half
         for _ in 0..<(populationSize - populationSize/2) {
-            let depth = Int.random(in: 1...maxDepth)
+            let depth = Int.random(in: 2...maxDepth)
             population.append(ParseTree.generateGrow(
                 functionSet: functionSet,
                 terminalRules: terminalRules,
@@ -627,10 +627,46 @@ class GeneticProgramming {
     }
     
     // Fitness function for Iris classification
-    func fitnessFunction(individual: ParseTree, data: [[Double]], labels: [Int]) -> Double {
-        // Placeholder fitness function
-        // Should evaluate how well the tree classifies the Iris data
-        return 0.0
+    func fitnessFunction(individual: ParseTree, data: [[Double]], labels: [Int], targetClass: Int = -1) -> Double {
+        var correctCount = 0
+        
+        for i in 0..<data.count {
+            let features = data[i]
+            let actualLabel = labels[i]
+            
+            // Create variable values mapping
+            var variableValues: [String: Double] = [:]
+            for j in 0..<features.count {
+                variableValues["X\(j+1)"] = features[j]
+            }
+            
+            // Evaluate the tree to get the predicted value
+            let predictedValue = individual.evaluate(variableValues: variableValues)
+            
+            // Binary classification: If targetClass specified, do one-vs-all
+            if targetClass >= 0 {
+                let predictedClass = predictedValue > 0 ? targetClass : (targetClass == 0 ? 1 : 0)
+                if predictedClass == actualLabel {
+                    correctCount += 1
+                }
+            } else {
+                // Simple classification based on value range
+                let predictedClass: Int
+                if predictedValue < 0.33 {
+                    predictedClass = 0  // Setosa
+                } else if predictedValue < 0.66 {
+                    predictedClass = 1  // Versicolor
+                } else {
+                    predictedClass = 2  // Virginica
+                }
+                
+                if predictedClass == actualLabel {
+                    correctCount += 1
+                }
+            }
+        }
+        
+        return Double(correctCount) / Double(data.count)
     }
     
     // Tournament selection
