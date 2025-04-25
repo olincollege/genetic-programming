@@ -564,7 +564,8 @@ class ParseTree: CustomStringConvertible {
     }
 }
 
-// Example implementation for genetic programming with the Iris dataset
+// MARK: - Genetic Programming
+
 class GeneticProgramming {
     let functionSet: [String]
     let terminalRules: TerminalGenerationRules
@@ -688,17 +689,28 @@ class GeneticProgramming {
     }
     
     // Evolve the population for a number of generations
-    func evolve(data: [[Double]], labels: [Int]) -> ParseTree {
+    func evolve(data: [[Double]], labels: [Int], targetClass: Int = -1) -> ParseTree {
         initializePopulation()
         
         for generation in 0..<maxGenerations {
             // Calculate fitness for each individual
-            let fitnesses = population.map { fitnessFunction(individual: $0, data: data, labels: labels) }
+            let fitnesses = population.map { fitnessFunction(individual: $0, data: data, labels: labels, targetClass: targetClass) }
             
             // Find the best individual
             if let maxIndex = fitnesses.indices.max(by: { fitnesses[$0] < fitnesses[$1] }) {
-                let bestFitness = fitnesses[maxIndex]
-                print("Generation \(generation): Best fitness = \(bestFitness)")
+                let best = fitnesses[maxIndex]
+                
+                // Update best individual if improved
+                if best > bestFitness {
+                    bestFitness = best
+                    bestIndividual = population[maxIndex].copy()
+                }
+                
+                // Track average fitness
+                let avgFitness = fitnesses.reduce(0, +) / Double(fitnesses.count)
+                fitnessHistory.append(avgFitness)
+                
+                print("Generation \(generation): Best fitness = \(bestFitness), Avg fitness = \(avgFitness)")
                 
                 // Return if perfect solution found
                 if bestFitness >= 1.0 {
@@ -711,58 +723,49 @@ class GeneticProgramming {
             
             // Elitism - keep the best individual
             if let maxIndex = fitnesses.indices.max(by: { fitnesses[$0] < fitnesses[$1] }) {
-                newPopulation.append(population[maxIndex])
+                newPopulation.append(population[maxIndex].copy())
             }
             
             // Fill the rest of the population through selection, crossover, and mutation
             while newPopulation.count < populationSize {
+                // Select parents
                 let parent1 = tournamentSelection(fitnesses: fitnesses)
                 
                 // Crossover with probability crossoverRate
                 if Double.random(in: 0...1) < crossoverRate {
+                    // Crossover
                     let parent2 = tournamentSelection(fitnesses: fitnesses)
-                    let (child1, child2) = ParseTree.crossover(parent1: parent1, parent2: parent2)
+                    let child = ParseTree.crossover(parent1: parent1, parent2: parent2)
                     
-                    // Mutation with probability mutationRate
+                    // Mutation
                     if Double.random(in: 0...1) < mutationRate {
-                        newPopulation.append(child1.mutate(
+                        newPopulation.append(child.mutate(
                             functionSet: functionSet,
                             terminalRules: terminalRules,
                             maxDepth: maxDepth,
-                            terminalProb: 0.5
+                            terminalProb: 0.1
                         ))
                     } else {
-                        newPopulation.append(child1)
-                    }
-                    
-                    if newPopulation.count < populationSize {
-                        if Double.random(in: 0...1) < mutationRate {
-                            newPopulation.append(child2.mutate(
-                                functionSet: functionSet,
-                                terminalRules: terminalRules,
-                                maxDepth: maxDepth,
-                                terminalProb: 0.5
-                            ))
-                        } else {
-                            newPopulation.append(child2)
-                        }
+                        newPopulation.append(child)
                     }
                 } else {
-                    // No crossover, just copy
+                    // No crossover
                     if Double.random(in: 0...1) < mutationRate {
+                        // Mutation
                         newPopulation.append(parent1.mutate(
                             functionSet: functionSet,
                             terminalRules: terminalRules,
                             maxDepth: maxDepth,
-                            terminalProb: 0.5
+                            terminalProb: 0.1
                         ))
                     } else {
-                        newPopulation.append(parent1)
+                        // Direct copy
+                        newPopulation.append(parent1.copy())
                     }
                 }
             }
             
-            // Make sure we don't exceed population size
+            // Ensure we don't exceed population size
             while newPopulation.count > populationSize {
                 newPopulation.removeLast()
             }
