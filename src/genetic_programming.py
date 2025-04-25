@@ -12,6 +12,16 @@ class IrisGP:
     """
     Classifier for the Iris dataset using Genetic Programming.
 
+    Constants:
+        THRESHOLD_LOW (float): The low threshold for classification.
+        THRESHOLD_HIGH (float): The high threshold for classification.
+
+        Classification is based on comparing the output of the parse tree
+        to the thresholds:
+            res < THRESHOLD_LOW                     --> Iris-setosa
+            THRESHOLD_LOW <= res < THRESHOLD_HIGH   --> Iris-versicolor
+            res >= THRESHOLD_HIGH                   --> Iris-virginica
+
     Attributes:
         function_set (list[str]): The set of functions for parse trees to use.
         terminal_rules (TerminalGenerationRules): The rules for generating
@@ -21,6 +31,9 @@ class IrisGP:
         terminal_prob (float): The probability of a node being a terminal node.
             Expected to be between 0 and 1.
     """
+
+    THRESHOLD_LOW = 0.33
+    THRESHOLD_HIGH = 0.66
 
     def __init__(
         self,
@@ -53,17 +66,11 @@ class IrisGP:
         return fitness
 
     @staticmethod
-    def evaluate_row(
-        individual: ParseTree, row: pd.Series, t1=0.33, t2=0.66
-    ) -> tuple[bool, float]:
+    def evaluate_row(individual: ParseTree, row: pd.Series) -> tuple[bool, float]:
         """
         Checks if the individual (parse tree) classifies a row correctly.
-
-        The classification is based on comparing the output of the parse tree
-        to a threshold value:
-            res < t1     --> Iris-setosa
-            t1 <= res < t2 --> Iris-versicolor
-            res >= t2    --> Iris-virginica
+        Classification is based comparing the output of the parse tree
+        to the thresholds (see class docstring above).
 
         This function assumes the variables in the parse tree have the same
         names as the columns in the row.
@@ -80,9 +87,9 @@ class IrisGP:
             float: The output of the parse tree for the given row.
         """
         res = individual.evaluate(dict(row))
-        if res < t1:
+        if res < IrisGP.THRESHOLD_LOW:
             predicted = "Iris-setosa"
-        elif res < t2:
+        elif res < IrisGP.THRESHOLD_HIGH:
             predicted = "Iris-versicolor"
         else:
             predicted = "Iris-virginica"
