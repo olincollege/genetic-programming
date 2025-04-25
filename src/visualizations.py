@@ -95,3 +95,24 @@ class Visualizations:
         plt.ylabel("Actual Species")
         plt.title("GP Predicted Species Confusion Matrix")
         plt.show()
+
+    @staticmethod
+    def plot_paramter_sweep_results(param_grid: dict, df: pd.DataFrame):
+        """
+        Plot the results of the parameter sweep.
+        Args:
+            param_grid: Dictionary of parameters to sweep keys include population_size, generations,
+            crossover_rate, mutation_rate, num_champions_to_survive and the values are the
+            lists of the parameters.
+            df: DataFrame with the parameter sweep results.
+        """
+        sns.set_theme(style="whitegrid")
+        for param in param_grid.keys():
+            subset = df[df["param"] == param]
+            plt.figure(figsize=(6, 4))
+            sns.lineplot(x="value", y="accuracy", data=subset, marker="o")
+            plt.title(f"Effect of {param} on Accuracy")
+            plt.xlabel(param)
+            plt.ylabel("Accuracy")
+            plt.tight_layout()
+            plt.show()

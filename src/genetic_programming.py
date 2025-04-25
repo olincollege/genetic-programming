@@ -209,6 +209,22 @@ class IrisGP:
 
         return best_individual, fitness_cache[best_individual], fitness_history
 
+    @staticmethod
+    def tree_to_class(tree, row):
+        """
+        Convert the parse tree to a class label based on the output value.
+        Args:
+            tree: The parse tree representing the model.
+            row: A row from the test DataFrame.
+        Returns:
+            The predicted class label. Should be one of "Iris-setosa", "Iris-versicolor",
+            or "Iris-virginica".
+        """
+        value = tree.evaluate(row)
+        class_index = round(value)
+        class_index = max(0, min(2, class_index))  # clamp to 0–2
+        return ["Iris-setosa", "Iris-versicolor", "Iris-virginica"][class_index]
+
 
 class FitnessCache:
     """
