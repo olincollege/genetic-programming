@@ -576,6 +576,9 @@ class GeneticProgramming {
     let mutationRate: Double
     
     var population: [ParseTree] = []
+    var bestFitness: Double = 0.0
+    var bestIndividual: ParseTree?
+    var fitnessHistory: [Double] = []
     
     init(
         functionSet: [String],
