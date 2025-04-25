@@ -731,7 +731,6 @@ class GeneticProgramming {
                 // Select parents
                 let parent1 = tournamentSelection(fitnesses: fitnesses)
                 
-                // Crossover with probability crossoverRate
                 if Double.random(in: 0...1) < crossoverRate {
                     // Crossover
                     let parent2 = tournamentSelection(fitnesses: fitnesses)
@@ -880,5 +879,9 @@ let classifiers = gp.solveMultiClass(data: trainFeatures, labels: trainLabels)
 print("\nTesting classifier on test data...")
 let accuracy = gp.testMultiClass(classifiers: classifiers, testData: testFeatures, testLabels: testLabels)
 
-// Create test data split
-let (trainData, testData) = dataset.splitData(trainRatio: 0.7)
+// 7. Output best solutions
+print("\nBest solutions for each class:")
+for (i, tree) in classifiers.enumerated() {
+    print("\nClass \(i) classifier:")
+    print(tree)
+}
