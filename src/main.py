@@ -42,7 +42,7 @@ def main():
         generations=20,
         crossover_rate=0.9,
         mutation_rate=0.1,
-        num_parents_to_survive=10,
+        num_champions_to_survive=10,
         train_df=train_df,
     )
 
