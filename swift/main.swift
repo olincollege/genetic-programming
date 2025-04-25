@@ -1068,8 +1068,8 @@ func runSwiftBenchmarks() {
     }
     
     // Save results
-    saveResultsToCSV(results: benchmarkResults, filename: "swift_gp_benchmarks.csv")
-    print("\nBenchmark results saved to 'swift_gp_benchmarks.csv'")
+    saveResultsToCSV(results: benchmarkResults, filename: "../data/swift_gp_benchmarks.csv")
+    print("\nBenchmark results saved to '../data/swift_gp_benchmarks.csv'")
 }
 
 // Add this to the end of main.swift

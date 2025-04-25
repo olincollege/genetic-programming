@@ -1,2 +1,3 @@
 pandas
-sklearn
+scikit-learn
+matplotlib

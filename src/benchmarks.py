@@ -342,7 +342,7 @@ def run_benchmarks():
   
   # Save results to CSV
   results_df = pd.DataFrame(results)
-  results_df.to_csv('python_gp_benchmarks.csv', index=False)
+  results_df.to_csv('../data/python_gp_benchmarks.csv', index=False)
   
   # Plot results
   plt.figure(figsize=(12, 6))
