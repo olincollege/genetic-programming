@@ -855,10 +855,22 @@ let gp = GeneticProgramming(
     mutationRate: 0.1
 )
 
-// 4. Implement missing methods:
-// - Complete the mutate method in ParseTree
-// - Complete the crossover method in ParseTree
-// - Implement the fitnessFunction inside GeneticProgramming
+// 4. Create train/test split
+let (trainData, testData) = dataset.splitData(trainRatio: 0.7)
+let (trainFeatures, trainLabels) = (
+    trainData.map { sample in 
+        [sample.features.sepalLength, sample.features.sepalWidth, 
+         sample.features.petalLength, sample.features.petalWidth] 
+    },
+    trainData.map { $0.speciesIndex }
+)
+let (testFeatures, testLabels) = (
+    testData.map { sample in 
+        [sample.features.sepalLength, sample.features.sepalWidth, 
+         sample.features.petalLength, sample.features.petalWidth] 
+    },
+    testData.map { $0.speciesIndex }
+)
 
 // 5. Run the genetic programming algorithm
 let bestSolution = gp.evolve(data: features, labels: labels)
