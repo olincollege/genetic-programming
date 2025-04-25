@@ -181,7 +181,7 @@ class IrisGP:
                 if random.random() < crossover_rate:
                     # `crossover_rate` is the probability of crossover
                     child, _ = GeneticOperators.crossover(parent1, parent2)
-                    offspring.append(child)
+                    offspring.append(deepcopy(child))
                 else:
                     # If no crossover, just clone one of the parents
                     offspring.append(deepcopy(parent1))
@@ -228,22 +228,28 @@ class FitnessCache:
 
     def __init__(self, train_df: pd.DataFrame):
 
-        # Initialize None to -inf so a best individual of None is always overridden
-        self.map = {None: float("-inf")}
+        self.map = {}
         self.train_df = train_df
 
-    def __getitem__(self, key: ParseTree) -> float:
+    def __getitem__(self, tree: ParseTree) -> float:
         """
         Returns the fitness score for a given individual.
         Evaluates the fitness if not already calculated.
 
         Args:
-            key (list): The schedule to evaluate
+            tree (ParseTree): The tree to get the fitness of.
 
         Returns (float): The fitness score of the individual
         """
+        # Map None to -inf so a best individual of None is always overridden
+        if tree is None:
+            return float("-inf")
+
+        # Could change this to `key = repr(tree)` for more correct hashing,
+        # however it slows down the runtime by 3x, so this works good enough.
+        key = tree
         if key not in self.map:
-            self.map[key] = IrisGP.evaluate_fitness(key, self.train_df)
+            self.map[key] = IrisGP.evaluate_fitness(tree, self.train_df)
         return self.map[key]
 
 
