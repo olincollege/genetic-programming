@@ -4,6 +4,7 @@ Parse trees for genetic programming.
 
 import random
 import math
+from typing import Optional, Tuple
 
 
 class ParseNode:
@@ -126,7 +127,7 @@ class ParseTree:
 
     def get_random_node(
         self, node_type: str = "any"
-    ) -> tuple["ParseNode", "ParseNode" | None]:
+    ) -> Tuple["ParseNode", Optional["ParseNode"]]:
         """
         Returns a random node from the parse tree. The node should be of the type specified in node_type.
         The parent of the node is also returned. If the node is the root, the parent is None.
@@ -136,7 +137,7 @@ class ParseTree:
                 - "leaf": A terminal node.
                 - "internal": A function node.
         Returns:
-            tuple[ParseNode, ParseNode | None]: A tuple containing the random node and its parent.
+            tuple[ParseNode, Optional[ParseNode]]: A tuple containing the random node and its parent.
         """
         nodes = []
 
