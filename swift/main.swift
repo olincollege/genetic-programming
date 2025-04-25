@@ -125,7 +125,7 @@ class IrisDataset {
     
     // Helper to normalize a single value
     private func normalize(_ value: Double, min: Double, max: Double) -> Double {
-        return (value - min) / (max - min)
+        return min == max ? 0 : (value - min) / (max - min)
     }
     
     // Split data into training and testing sets
