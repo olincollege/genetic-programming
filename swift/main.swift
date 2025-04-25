@@ -606,6 +606,13 @@ class ParseTree: CustomStringConvertible {
 
 // MARK: - Genetic Programming
 
+/**
+ * Genetic Programming class for evolving parse trees.
+ *
+ * This class implements the genetic programming algorithm to evolve parse trees
+ * for classification tasks. It includes methods for initialization, fitness evaluation,
+ * selection, crossover, mutation, and multi-class classification.
+ */
 class GeneticProgramming {
     let functionSet: [String]
     let terminalRules: TerminalGenerationRules
@@ -621,6 +628,19 @@ class GeneticProgramming {
     var bestIndividual: ParseTree?
     var fitnessHistory: [Double] = []
     
+    /**
+     * Initializes the genetic programming parameters.
+     
+     - Parameters:
+        - functionSet: Array of function names to be used in the parse tree.
+        - terminalRules: Rules for generating terminal nodes.
+        - populationSize: Size of the population (default is 100).
+        - maxGenerations: Maximum number of generations to evolve (default is 50).
+        - maxDepth: Maximum depth of the parse trees (default is 6).
+        - tournamentSize: Size of the tournament for selection (default is 7).
+        - crossoverRate: Probability of crossover between parents (default is 0.9).
+        - mutationRate: Probability of mutation (default is 0.1).
+     */
     init(
         functionSet: [String],
         terminalRules: TerminalGenerationRules,
@@ -641,7 +661,13 @@ class GeneticProgramming {
         self.mutationRate = mutationRate
     }
     
-    // Initialize the population with random parse trees
+    /**
+     * Initializes the population of parse trees.
+     
+     This method creates a population of parse trees using a mix of full and grow methods.
+     Half of the population is generated using the full method, while the other half uses
+     the grow method. The depth of the trees is randomly chosen within the specified range.
+     */
     func initializePopulation() {
         population = []
         
@@ -667,7 +693,20 @@ class GeneticProgramming {
         }
     }
     
-    // Fitness function for Iris classification
+    /**
+     * Fitness function to evaluate the performance of a parse tree.
+     
+     This function calculates the fitness of a parse tree by evaluating it against
+     a dataset and counting how many predictions match the actual labels.
+     
+     - Parameters:
+        - individual: The parse tree to evaluate.
+        - data: A 2D array where each inner array represents a training instance with its features.
+        - labels: An array of integers representing the class labels for the training data.
+        - targetClass: The class index to evolve for (default is -1 for multi-class).
+     
+     - Returns: A Double value representing the fitness score (accuracy).
+     */
     func fitnessFunction(individual: ParseTree, data: [[Double]], labels: [Int], targetClass: Int = -1) -> Double {
         var correctCount = 0
         
@@ -710,7 +749,17 @@ class GeneticProgramming {
         return Double(correctCount) / Double(data.count)
     }
     
-    // Tournament selection
+    /**
+     * Tournament selection for selecting parents based on fitness.
+     
+     This method selects a parse tree from the population using tournament selection,
+     which randomly selects a subset of individuals and chooses the best one among them.
+     
+     - Parameters:
+        - fitnesses: An array of fitness values for the current population.
+     
+     - Returns: The selected parse tree.
+     */
     func tournamentSelection(fitnesses: [Double]) -> ParseTree {
         var bestIndex = Int.random(in: 0..<populationSize)
         var bestFitness = fitnesses[bestIndex]
@@ -728,7 +777,19 @@ class GeneticProgramming {
         return population[bestIndex]
     }
     
-    // Evolve the population for a number of generations
+    /**
+     * Evolves the population of parse trees using genetic programming.
+     
+     This method performs the main loop of the genetic programming algorithm,
+     evolving a population of parse trees over a specified number of generations.
+     
+     - Parameters:
+        - data: A 2D array where each inner array represents a training instance with its features.
+        - labels: An array of integers representing the class labels for the training data.
+        - targetClass: The class index to evolve for (default is -1 for multi-class).
+     
+     - Returns: The best parse tree found during evolution.
+     */
     func evolve(data: [[Double]], labels: [Int], targetClass: Int = -1) -> ParseTree {
         initializePopulation()
         
@@ -816,7 +877,20 @@ class GeneticProgramming {
         return bestIndividual ?? population[0]
     }
     
-    // Multi-class classification using "one-vs-all" approach with multiple trees
+    /**
+     * Solves the multi-class classification problem using genetic programming.
+     
+     This method trains multiple classifiers, one for each class, using the provided
+     training data and labels. It returns an array of parse trees representing the
+     trained classifiers.
+     
+     - Parameters:
+        - data: A 2D array where each inner array represents a training instance with its features.
+        - labels: An array of integers representing the class labels for the training data.
+        - numClasses: The number of classes in the dataset (default is 3 for Iris dataset).
+     
+     - Returns: An array of parse trees representing the trained classifiers for each class.
+     */
     func solveMultiClass(data: [[Double]], labels: [Int], numClasses: Int = 3) -> [ParseTree] {
         var classifiers: [ParseTree] = []
         
@@ -835,7 +909,20 @@ class GeneticProgramming {
         return classifiers
     }
     
-    // Test multi-class classification accuracy
+    /**
+     Tests the performance of multiple classifiers on the provided test data.
+     
+     This method evaluates how well the given classifiers perform on the test dataset
+     by comparing their predictions against the provided test labels.
+     
+     - Parameters:
+        - classifiers: An array of parse trees representing different classifiers.
+        - testData: A 2D array where each inner array represents a test instance with its features.
+        - testLabels: The correct class labels for the test data.
+     
+     - Returns: A performance metric (likely accuracy) as a Double value, indicating how well the
+        classifiers performed on the test data.
+     */
     func testMultiClass(classifiers: [ParseTree], testData: [[Double]], testLabels: [Int]) -> Double {
         var correctCount = 0
         
