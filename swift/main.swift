@@ -876,9 +876,9 @@ let (testFeatures, testLabels) = (
 print("Training multi-class classifier...")
 let classifiers = gp.solveMultiClass(data: trainFeatures, labels: trainLabels)
 
-// 6. Test the best solution
-print("Best solution: \(bestSolution)")
-print("Testing solution...")
+// 6. Test classifier
+print("\nTesting classifier on test data...")
+let accuracy = gp.testMultiClass(classifiers: classifiers, testData: testFeatures, testLabels: testLabels)
 
 // Create test data split
 let (trainData, testData) = dataset.splitData(trainRatio: 0.7)
