@@ -981,3 +981,97 @@ func saveResultsToCSV(results: [BenchmarkResult], filename: String) {
         print("Error saving results: \(error.localizedDescription)")
     }
 }
+
+// MARK: - Main Benchmark Function
+
+func runSwiftBenchmarks() {
+    print("Running Swift GP benchmarks...\n")
+    
+    // Load dataset
+    let dataset = loadIrisDataset()
+    let (trainData, testData) = dataset.splitData(trainRatio: 0.7)
+    
+    // Prepare data
+    let trainFeatures = trainData.map { sample in 
+        [sample.features.sepalLength, sample.features.sepalWidth, 
+         sample.features.petalLength, sample.features.petalWidth] 
+    }
+    let trainLabels = trainData.map { $0.speciesIndex }
+    
+    let testFeatures = testData.map { sample in 
+        [sample.features.sepalLength, sample.features.sepalWidth, 
+         sample.features.petalLength, sample.features.petalWidth] 
+    }
+    let testLabels = testData.map { $0.speciesIndex }
+    
+    // Configure benchmark parameters
+    let populationSizes = [50, 100, 200]
+    let generationCounts = [10, 20, 50]
+    
+    // Create base GP instance
+    let functionSet = ["+", "-", "*", "/"]
+    let terminalRules = TerminalGenerationRules(
+        literals: dataset.getFeatureNames(),
+        constantsRange: (-10, 10)
+    )
+    
+    let gp = GeneticProgramming(
+        functionSet: functionSet,
+        terminalRules: terminalRules,
+        populationSize: 100,
+        maxGenerations: 20,
+        maxDepth: 4,
+        tournamentSize: 7,
+        crossoverRate: 0.9,
+        mutationRate: 0.1
+    )
+    
+    // Run population size benchmarks
+    print("\nBenchmarking with varying population size...")
+    let popResults = gp.runPopulationSizeBenchmark(
+        sizes: populationSizes,
+        trainData: trainFeatures, 
+        trainLabels: trainLabels,
+        testData: testFeatures,
+        testLabels: testLabels
+    )
+    
+    // Run generation count benchmarks
+    print("\nBenchmarking with varying generation count...")
+    let genResults = gp.runGenerationCountBenchmark(
+        counts: generationCounts,
+        trainData: trainFeatures, 
+        trainLabels: trainLabels,
+        testData: testFeatures,
+        testLabels: testLabels
+    )
+    
+    // Prepare results for saving
+    var benchmarkResults: [BenchmarkResult] = []
+    
+    for (size, time, accuracy) in popResults {
+        benchmarkResults.append(BenchmarkResult(
+            parameter: "Population Size",
+            value: size,
+            time: time,
+            accuracy: accuracy
+        ))
+    }
+    
+    for (count, time, accuracy) in genResults {
+        benchmarkResults.append(BenchmarkResult(
+            parameter: "Generations",
+            value: count,
+            time: time,
+            accuracy: accuracy
+        ))
+    }
+    
+    // Save results
+    saveResultsToCSV(results: benchmarkResults, filename: "swift_gp_benchmarks.csv")
+    print("\nBenchmark results saved to 'swift_gp_benchmarks.csv'")
+}
+
+// Add this to the end of main.swift
+print("\n===== RUNNING BENCHMARKS =====")
+runSwiftBenchmarks()
