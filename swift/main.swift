@@ -872,8 +872,9 @@ let (testFeatures, testLabels) = (
     testData.map { $0.speciesIndex }
 )
 
-// 5. Run the genetic programming algorithm
-let bestSolution = gp.evolve(data: features, labels: labels)
+// 5. Train multi-class classifier
+print("Training multi-class classifier...")
+let classifiers = gp.solveMultiClass(data: trainFeatures, labels: trainLabels)
 
 // 6. Test the best solution
 print("Best solution: \(bestSolution)")
