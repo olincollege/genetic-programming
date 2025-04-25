@@ -500,41 +500,67 @@ class ParseTree: CustomStringConvertible {
             terminalProb: terminalProb
         )
         
-        // Placeholder - actual implementation needed
-        return self
+        if parent == nil {
+            mutatedTree.root = newSubtree
+        } else if let parent = parent as? FunctionNode {
+            for i in 0..<parent.children.count {
+                if parent.children[i] === nodeToReplace {
+                    parent.children[i] = newSubtree
+                    break
+                }
+            }
+        }
+        
+        return mutatedTree
+    }
+    
+    // Mutation: Replace a random terminal node
+    func pointMutate(terminalRules: TerminalGenerationRules) -> ParseTree {
+        let mutatedTree = self.copy()
+        let (nodeToReplace, parent) = mutatedTree.getRandomNode(nodeType: "leaf")
+        let newTerminal = TerminalNode.fromTerminalSet(rules: terminalRules)
+        
+        if parent == nil {
+            // This should only happen if the tree is a single node
+            mutatedTree.root = FunctionNode(value: "+", children: [newTerminal, TerminalNode(value: "0")])
+        } else if let parent = parent as? FunctionNode {
+            for i in 0..<parent.children.count {
+                if parent.children[i] === nodeToReplace {
+                    parent.children[i] = newTerminal
+                    break
+                }
+            }
+        }
+        
+        return mutatedTree
     }
     
     // Crossover: Swap subtrees between two parse trees
-    static func crossover(
-        parent1: ParseTree,
-        parent2: ParseTree
-    ) -> (ParseTree, ParseTree) {
-        // Create deep copies of both parents
-        // Select random crossover points in each parent
-        // Swap the subtrees at these points
+    static func crossover(parent1: ParseTree, parent2: ParseTree) -> ParseTree {
+        let child = parent1.copy()
+        let (node1, parent1Node) = child.getRandomNode()
+        let (node2, _) = parent2.getRandomNode()
         
-        // Placeholder - actual implementation needed
-        return (parent1, parent2)
-    }
-}
-
-// Helper extension to enable description of parse trees
-extension FunctionNode: CustomStringConvertible {
-    var description: String {
-        let args = children.map { String(describing: $0) }.joined(separator: " ")
-        return "(\(value) \(args))"
-    }
-}
-
-extension TerminalNode: CustomStringConvertible {
-    var description: String {
-        return value
-    }
-}
-
-extension ParseTree: CustomStringConvertible {
-    var description: String {
-        return String(describing: root)
+        let newSubtree = node2.copy()
+        
+        if parent1Node == nil {
+            // If the selected node is the root
+            if let functionNode = newSubtree as? FunctionNode {
+                child.root = functionNode
+            } else {
+                // If newSubtree is a terminal, we need to create a function node
+                child.root = FunctionNode(value: "+", children: [newSubtree, TerminalNode(value: "0")])
+            }
+        } else if let parent = parent1Node as? FunctionNode {
+            for i in 0..<parent.children.count {
+                if parent.children[i] === node1 {
+                    parent.children[i] = newSubtree
+                    break
+                }
+            }
+        }
+        
+        return child
     }
 }
 
