@@ -226,27 +226,6 @@ class IrisDataset {
     }
 }
 
-// Iris Dataset Loading - Usage Example
-
-func loadIrisDataset() -> IrisDataset {
-    let dataset = IrisDataset()
-    
-    do {
-        // Try to load from bundle first
-        if let fileURL = Bundle.main.url(forResource: "Iris", withExtension: "csv") {
-            try dataset.loadFromCSV(filePath: fileURL.path)
-        } else {
-            // Fallback to direct path
-            let filePath = "../data/Iris.csv" // Adjust path as needed
-            try dataset.loadFromCSV(filePath: filePath)
-        }
-    } catch {
-        print("Error loading dataset: \(error.localizedDescription)")
-    }
-    
-    return dataset
-}
-
 // MARK: - Genetic Programming Structures
 
 /**
@@ -892,8 +871,38 @@ class GeneticProgramming {
 
 // MARK: - Benchmarking Extension
 
+/**
+ * Extension for GeneticProgramming to add benchmarking capabilities.
+ *
+ * This extension provides methods to benchmark the performance of the genetic programming algorithm
+ * with different population sizes and generation counts. It allows for easy evaluation of how these
+ * parameters affect the execution time and accuracy of the algorithm.
+ */
 extension GeneticProgramming {
-    // Run benchmarks with different population sizes
+    
+    /**
+     Benchmarks the genetic programming algorithm's performance with various population sizes.
+     
+     This function evaluates how different population sizes affect the performance and accuracy
+     of the genetic programming algorithm. For each specified population size, it creates a new GP instance,
+     measures the time taken to train classifiers on the training data, and evaluates the accuracy
+     on the test data.
+     
+     - Parameters:
+        - sizes: An array of integer values representing different population sizes to benchmark
+        - trainData: A 2D array of Doubles containing the training data features
+        - trainLabels: An array of integers representing the class labels for the training data
+        - testData: A 2D array of Doubles containing the test data features
+        - testLabels: An array of integers representing the class labels for the test data
+        
+     - Returns: An array of tuples, where each tuple contains:
+        - size: The population size used
+        - time: The execution time in seconds
+        - accuracy: The classification accuracy achieved on the test data
+     
+     - Note: All other genetic programming parameters (like generation count, mutation rate, etc.)
+                are taken from the current instance's properties.
+     */
     func runPopulationSizeBenchmark(sizes: [Int], trainData: [[Double]], trainLabels: [Int], testData: [[Double]], testLabels: [Int]) -> [(size: Int, time: Double, accuracy: Double)] {
         var results: [(size: Int, time: Double, accuracy: Double)] = []
         
@@ -925,8 +934,30 @@ extension GeneticProgramming {
         
         return results
     }
-    
-    // Run benchmarks with different generation counts
+
+    /**
+     Benchmarks the genetic programming algorithm's performance with various generation count settings.
+     
+     This function evaluates how different maximum generation counts affect the performance and accuracy
+     of the genetic programming algorithm. For each specified generation count, it creates a new GP instance,
+     measures the time taken to train classifiers on the training data, and evaluates the accuracy
+     on the test data.
+     
+     - Parameters:
+        - counts: An array of integer values representing different maximum generation counts to benchmark
+        - trainData: A 2D array of Doubles containing the training data features
+        - trainLabels: An array of integers representing the class labels for the training data
+        - testData: A 2D array of Doubles containing the test data features
+        - testLabels: An array of integers representing the class labels for the test data
+        
+     - Returns: An array of tuples, where each tuple contains:
+        - count: The generation count used
+        - time: The execution time in seconds
+        - accuracy: The classification accuracy achieved on the test data
+     
+     - Note: All other genetic programming parameters (like population size, mutation rate, etc.)
+                are taken from the current instance's properties.
+     */
     func runGenerationCountBenchmark(counts: [Int], trainData: [[Double]], trainLabels: [Int], testData: [[Double]], testLabels: [Int]) -> [(count: Int, time: Double, accuracy: Double)] {
         var results: [(count: Int, time: Double, accuracy: Double)] = []
         
@@ -960,8 +991,16 @@ extension GeneticProgramming {
     }
 }
 
-// MARK: - Benchmark Results Storage
-
+/**
+ * A structure that encapsulates the results of a benchmark operation.
+ *
+ * This struct stores performance metrics and other data collected during benchmarking.
+ * It conforms to `Codable` to enable serialization and deserialization of benchmark
+ * results, allowing them to be stored or transferred as needed.
+ *
+ * Use this structure to maintain consistent representation of benchmark data
+ * throughout the application and for data persistence.
+ */
 struct BenchmarkResult: Codable {
     let parameter: String
     let value: Int
@@ -969,6 +1008,18 @@ struct BenchmarkResult: Codable {
     let accuracy: Double
 }
 
+// MARK: - Utility Functions
+
+/**
+ Saves benchmark results to a CSV file.
+ 
+ This function takes an array of benchmark results and saves them to a specified CSV file.
+ The CSV file will contain the parameter name, value, execution time, and accuracy for each result.
+ 
+ - Parameters:
+    - results: An array of `BenchmarkResult` objects containing the benchmark data.
+    - filename: The name of the CSV file to save the results to.
+ */
 func saveResultsToCSV(results: [BenchmarkResult], filename: String) {
     // Create CSV content
     var csvContent = "parameter,value,time,accuracy\n"
@@ -986,8 +1037,50 @@ func saveResultsToCSV(results: [BenchmarkResult], filename: String) {
     }
 }
 
+/**
+ Loads the Iris dataset from a CSV file.
+ 
+ This function attempts to load the Iris dataset from a specified CSV file.
+ If the file is not found in the main bundle, it falls back to a default path.
+ 
+ - Returns: An instance of `IrisDataset` containing the loaded data.
+ */
+func loadIrisDataset() -> IrisDataset {
+    let dataset = IrisDataset()
+    
+    do {
+        // Try to load from bundle first
+        if let fileURL = Bundle.main.url(forResource: "Iris", withExtension: "csv") {
+            try dataset.loadFromCSV(filePath: fileURL.path)
+        } else {
+            // Fallback to direct path
+            let filePath = "../data/Iris.csv" // Adjust path as needed
+            try dataset.loadFromCSV(filePath: filePath)
+        }
+    } catch {
+        print("Error loading dataset: \(error.localizedDescription)")
+    }
+    
+    return dataset
+}
+
 // MARK: - Main Benchmark Function
 
+/**
+ Runs a suite of benchmarks for genetic programming in Swift.
+ 
+ This function benchmarks the performance of genetic programming
+ algorithms on the Iris dataset. It evaluates the impact of different
+ population sizes and generation counts on execution time and accuracy.
+ Call this function to execute the benchmarks and save results to a CSV file.
+ 
+ - Note: Ensure that the Iris dataset is available at the specified path.
+ 
+ - Parameters:
+    - None
+ - Returns:
+    - None
+ */
 func runSwiftBenchmarks() {
     print("Running Swift GP benchmarks...\n")
     
@@ -1076,6 +1169,7 @@ func runSwiftBenchmarks() {
     print("\nBenchmark results saved to '../data/swift_gp_benchmarks.csv'")
 }
 
-// Add this to the end of main.swift
+// MARK: - Main Execution
+
 print("\n===== RUNNING BENCHMARKS =====")
 runSwiftBenchmarks()
