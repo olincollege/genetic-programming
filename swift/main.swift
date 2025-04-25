@@ -2,39 +2,72 @@ import Foundation
 
 // MARK: - Iris Data Structures
 
+/// A structure representing the four measurements of an iris flower.
 struct IrisFeatures {
+    /// Length of the sepal in centimeters
     var sepalLength: Double
+
+    /// Width of the sepal in centimeters
     var sepalWidth: Double
+
+    /// Length of the petal in centimeters
     var petalLength: Double
+
+    /// Width of the petal in centimeters
     var petalWidth: Double
 }
 
+/// A complete iris sample with both features and classification information.
 struct IrisSample {
+    /// The four measurements of the iris flower
     let features: IrisFeatures
+    
+    /// The species name (e.g., "Iris-setosa", "Iris-versicolor", "Iris-virginica")
     let species: String
-    let speciesIndex: Int // 0 = setosa, 1 = versicolor, 2 = virginica
+    
+    /// Numeric index of the species (0 = setosa, 1 = versicolor, 2 = virginica)
+    let speciesIndex: Int
 }
 
 // MARK: - Iris Dataset Manager
 
+/**
+ * Manages loading, preprocessing, and partitioning of the Iris dataset.
+ *
+ * This class handles:
+ * - Loading data from CSV file
+ * - Data normalization
+ * - Train/test splitting
+ * - Conversion to formats needed for genetic programming
+ */
 class IrisDataset {
+    /// Array of all iris samples loaded from the dataset
     private(set) var samples: [IrisSample] = []
-    private(set) var normalizedSamples: [IrisSample] = []
     
-    // Maps for species to index conversion
+    /// Array of normalized iris samples (features scaled to [0,1] range)
+    private(set) var normalizedSamples: [IrisSample] = []
+
+    /// Dictionary mapping species names to numeric indices
     private let speciesMap = [
         "Iris-setosa": 0,
         "Iris-versicolor": 1,
         "Iris-virginica": 2
     ]
     
-    // Min and max values for each feature (used for normalization)
+    /// Minimum values for each feature (used in normalization)
     private var minValues = IrisFeatures(sepalLength: Double.infinity, sepalWidth: Double.infinity, 
                                          petalLength: Double.infinity, petalWidth: Double.infinity)
+    
+    /// Maximum values for each feature (used in normalization)
     private var maxValues = IrisFeatures(sepalLength: -Double.infinity, sepalWidth: -Double.infinity, 
                                          petalLength: -Double.infinity, petalWidth: -Double.infinity)
-    
-    // Load data from a CSV file
+
+    /**
+     * Loads and parses the Iris dataset from a CSV file.
+     *
+     * @param filePath Path to the CSV file containing Iris data
+     * @throws Error if file cannot be read or parsed
+     */
     func loadFromCSV(filePath: String) throws {
         let fileContents = try String(contentsOfFile: filePath, encoding: .utf8)
         let lines = fileContents.split(separator: "\n")
@@ -90,7 +123,11 @@ class IrisDataset {
         print("Loaded \(samples.count) samples from Iris dataset")
     }
     
-    // Update min and max values for normalization
+    /**
+     * Updates the minimum and maximum feature values for normalization.
+     *
+     * @param features An IrisFeatures instance to compare against current min/max
+     */
     private func updateMinMaxValues(features: IrisFeatures) {
         // Update min values
         minValues.sepalLength = min(minValues.sepalLength, features.sepalLength)
@@ -105,7 +142,11 @@ class IrisDataset {
         maxValues.petalWidth = max(maxValues.petalWidth, features.petalWidth)
     }
     
-    // Normalize data to [0,1] range
+    /**
+     * Normalizes all iris samples to have features in the [0,1] range.
+     *
+     * Uses the previously calculated min/max values to perform min-max scaling.
+     */
     private func normalizeData() {
         normalizedSamples = samples.map { sample in
             let normalizedFeatures = IrisFeatures(
@@ -123,12 +164,24 @@ class IrisDataset {
         }
     }
     
-    // Helper to normalize a single value
+    /**
+     * Normalizes a single value using min-max scaling.
+     *
+     * @param value The value to normalize
+     * @param min Minimum value for the feature
+     * @param max Maximum value for the feature
+     * @return Normalized value in [0,1] range
+     */
     private func normalize(_ value: Double, min: Double, max: Double) -> Double {
         return min == max ? 0 : (value - min) / (max - min)
     }
     
-    // Split data into training and testing sets
+    /**
+     * Splits the normalized dataset into training and testing subsets.
+     *
+     * @param trainRatio Proportion of data to use for training (default: 0.7)
+     * @return Tuple containing arrays of training and testing samples
+     */
     func splitData(trainRatio: Double = 0.7) -> (train: [IrisSample], test: [IrisSample]) {
         // Shuffle the data to ensure random distribution
         let shuffledData = normalizedSamples.shuffled()
@@ -143,7 +196,11 @@ class IrisDataset {
         return (train: trainData, test: testData)
     }
     
-    // Convert data to array format for genetic programming
+    /**
+     * Converts the normalized dataset to feature arrays and label arrays.
+     *
+     * @return Tuple containing feature matrix and label vector
+     */
     func getDataArrays() -> (features: [[Double]], labels: [Int]) {
         let features = normalizedSamples.map { sample in
             return [
@@ -159,7 +216,11 @@ class IrisDataset {
         return (features: features, labels: labels)
     }
     
-    // Get feature names for terminal set
+    /**
+     * Returns feature names for constructing terminal set in genetic programming.
+     *
+     * @return Array of strings representing feature names (X1, X2, X3, X4)
+     */
     func getFeatureNames() -> [String] {
         return ["X1", "X2", "X3", "X4"] // Corresponding to the 4 Iris features
     }
