@@ -64,9 +64,17 @@ class IrisDataset {
 
     /**
      * Loads and parses the Iris dataset from a CSV file.
-     *
-     * @param filePath Path to the CSV file containing Iris data
-     * @throws Error if file cannot be read or parsed
+     
+     - Parameters:
+        - filePath: Path to the CSV file containing the iris dataset.
+     
+     - Returns: A collection of parsed Iris data entries.
+     
+     - Throws: An error if the file cannot be found, read, or if the CSV format is invalid.
+     
+
+     - Note: The CSV file is expected to contain the standard Iris dataset format with
+             columns for sepal length, sepal width, petal length, petal width, and species.
      */
     func loadFromCSV(filePath: String) throws {
         let fileContents = try String(contentsOfFile: filePath, encoding: .utf8)
@@ -125,8 +133,9 @@ class IrisDataset {
     
     /**
      * Updates the minimum and maximum feature values for normalization.
-     *
-     * @param features An IrisFeatures instance to compare against current min/max
+    
+     - Parameters:
+        - features: The iris features to update min/max values with
      */
     private func updateMinMaxValues(features: IrisFeatures) {
         // Update min values
@@ -143,9 +152,10 @@ class IrisDataset {
     }
     
     /**
-     * Normalizes all iris samples to have features in the [0,1] range.
-     *
-     * Uses the previously calculated min/max values to perform min-max scaling.
+     * Normalizes all iris samples to have features in the [0,1] range. 
+       Uses the previously calculated min/max values to perform min-max scaling.
+     
+     - Returns: None
      */
     private func normalizeData() {
         normalizedSamples = samples.map { sample in
@@ -165,12 +175,14 @@ class IrisDataset {
     }
     
     /**
-     * Normalizes a single value using min-max scaling.
-     *
-     * @param value The value to normalize
-     * @param min Minimum value for the feature
-     * @param max Maximum value for the feature
-     * @return Normalized value in [0,1] range
+     * Normalizes a single feature value to the [0,1] range.
+
+     - Parameters:
+        - value: The feature value to normalize
+        - min: The minimum value of the feature
+        - max: The maximum value of the feature
+    
+     - Returns: The normalized value in the range [0,1]
      */
     private func normalize(_ value: Double, min: Double, max: Double) -> Double {
         return min == max ? 0 : (value - min) / (max - min)
@@ -178,9 +190,11 @@ class IrisDataset {
     
     /**
      * Splits the normalized dataset into training and testing subsets.
-     *
-     * @param trainRatio Proportion of data to use for training (default: 0.7)
-     * @return Tuple containing arrays of training and testing samples
+     
+     - Parameters:
+        - trainRatio: Proportion of data to use for training (default is 0.7)
+
+     - Returns: A tuple containing training and testing datasets
      */
     func splitData(trainRatio: Double = 0.7) -> (train: [IrisSample], test: [IrisSample]) {
         // Shuffle the data to ensure random distribution
@@ -198,8 +212,10 @@ class IrisDataset {
     
     /**
      * Converts the normalized dataset to feature arrays and label arrays.
-     *
-     * @return Tuple containing feature matrix and label vector
+    
+     - Returns: A tuple containing two arrays:
+        - features: 2D array of feature values
+        - labels: 1D array of class labels (species indices)
      */
     func getDataArrays() -> (features: [[Double]], labels: [Int]) {
         let features = normalizedSamples.map { sample in
@@ -217,9 +233,9 @@ class IrisDataset {
     }
     
     /**
-     * Returns feature names for constructing terminal set in genetic programming.
-     *
-     * @return Array of strings representing feature names (X1, X2, X3, X4)
+     * Returns the feature names for the dataset.
+    
+     - Returns: An array of feature names
      */
     func getFeatureNames() -> [String] {
         return ["X1", "X2", "X3", "X4"] // Corresponding to the 4 Iris features
@@ -229,7 +245,10 @@ class IrisDataset {
 // MARK: - Genetic Programming Structures
 
 /**
- * Rules for generating terminal nodes in a parse tree.
+ * Terminal generation rules for creating terminal nodes in the parse tree.
+ *
+ * This class defines the rules for generating terminal nodes, including literals,
+ * constants range, decimal places, and whether to use random constants or not.
  */
 class TerminalGenerationRules {
     let literals: [String]
@@ -238,6 +257,16 @@ class TerminalGenerationRules {
     let intsOnly: Bool
     let noRandomConstants: Bool
     
+    /**
+     * Initializes the terminal generation rules.
+     
+     - Parameters:
+        - literals: Array of variable names (e.g., ["X1", "X2", "X3", "X4"]).
+        - constantsRange: Range for generating random constants (min, max).
+        - decimalPlaces: Number of decimal places for rounding constants.
+        - intsOnly: If true, only integer constants will be generated.
+        - noRandomConstants: If true, only literals will be used (no random constants).
+     */
     init(literals: [String], 
          constantsRange: (Double, Double), 
          decimalPlaces: Int = 4, 
@@ -252,7 +281,9 @@ class TerminalGenerationRules {
 }
 
 /**
- * Protocol for nodes in a parse tree.
+ * Protocol defining the structure of a parse node in the parse tree.
+ *
+ * This protocol is implemented by both terminal and function nodes.
  */
 protocol ParseNode: AnyObject, CustomStringConvertible {
     var value: String { get }
@@ -266,10 +297,27 @@ protocol ParseNode: AnyObject, CustomStringConvertible {
 class TerminalNode: ParseNode {
     let value: String
     
+    /**
+     * Initializes a terminal node with a given value.
+     
+     - Parameters:
+        - value: The value of the terminal node (e.g., variable name or constant).
+     */
     init(value: String) {
         self.value = value
     }
     
+    /**
+     * Generates a terminal node from a set of literals and constants.
+     
+     This method randomly selects a literal or generates a random constant
+     based on the provided rules. It returns a new TerminalNode instance.
+     
+     - Parameters:
+        - rules: The rules for generating terminal nodes.
+     
+     - Returns: A new TerminalNode instance.
+     */
     static func fromTerminalSet(rules: TerminalGenerationRules) -> TerminalNode {
         let options = rules.noRandomConstants ? rules.literals.count - 1 : rules.literals.count
         let randomIndex = Int.random(in: 0...options)
@@ -291,6 +339,17 @@ class TerminalNode: ParseNode {
         }
     }
     
+    /**
+     * Evaluates the terminal node with given variable values.
+     
+     This method checks if the value is a variable or a constant and returns
+     the corresponding value based on the provided variable values.
+     
+     - Parameters:
+        - variableValues: A dictionary mapping variable names to their values.
+     
+     - Returns: The evaluated value of the terminal node.
+     */
     func evaluate(variableValues: [String: Double]) -> Double {
         if let variableValue = variableValues[value] {
             return variableValue
@@ -303,29 +362,61 @@ class TerminalNode: ParseNode {
         fatalError("Invalid terminal value: \(value)")
     }
     
+    /**
+     * Returns a string representation of the terminal node.
+     
+     This method provides a simple description of the terminal node, which is
+     useful for debugging and logging purposes.
+     
+     - Returns: A string representation of the terminal node.
+     */
     var description: String {
         return value
     }
     
+    /**
+     * Creates a copy of the terminal node.
+     
+     This method creates a new instance of the terminal node with the same value.
+     
+     - Returns: A new TerminalNode instance that is a copy of the original.
+     */
     func copy() -> ParseNode {
         return TerminalNode(value: self.value)
     }
 }
 
 /**
- * A function node in the parse tree, representing an operation with children nodes.
+ * A function node in the parse tree, representing a mathematical operation.
  */
 class FunctionNode: ParseNode {
     let value: String
     let arity: Int
     var children: [ParseNode]
     
+    /**
+     * Initializes a function node with a given value and children.
+     
+     - Parameters:
+        - value: The name of the function (e.g., "+", "-", "sin").
+        - children: An array of child nodes (either function or terminal nodes).
+     */
     init(value: String, children: [ParseNode]) {
         self.value = value
         self.arity = FunctionNode.arityMap(function: value)
         self.children = children
     }
     
+    /**
+     * Maps function names to their arity (number of arguments).
+     
+     This method returns the number of arguments required for a given function.
+     
+     - Parameters:
+        - function: The name of the function.
+     
+     - Returns: The arity of the function.
+     */
     static func arityMap(function: String) -> Int {
         switch function {
         case "+", "-", "*", "/":
@@ -337,6 +428,21 @@ class FunctionNode: ParseNode {
         }
     }
     
+    /**
+     * Generates a function node from a set of functions and terminal rules.
+     
+     This method creates a function node with a specified depth and probability
+     of generating terminal nodes. It recursively generates child nodes based on
+     the provided function set and terminal rules.
+     
+     - Parameters:
+        - functionSet: Array of function names to be used in the parse tree.
+        - terminalRules: The rules for generating terminal nodes.
+        - depth: Maximum depth of the tree.
+        - terminalProb: Probability of generating a terminal node.
+     
+     - Returns: A new FunctionNode instance representing the generated function node.
+     */
     static func fromFunctionSet(
         functionSet: [String], 
         terminalRules: TerminalGenerationRules, 
@@ -367,6 +473,18 @@ class FunctionNode: ParseNode {
         return node
     }
     
+    /**
+     * Evaluates the function node with given variable values.
+     
+     This method recursively evaluates the function node and its children
+     based on the provided variable values. It returns the result of the
+     evaluation.
+     
+     - Parameters:
+        - variableValues: A dictionary mapping variable names to their values.
+     
+     - Returns: The result of evaluating the function node.
+     */
     func evaluate(variableValues: [String: Double]) -> Double {
         let evaluatedChildren = children.map { $0.evaluate(variableValues: variableValues) }
         
@@ -399,11 +517,28 @@ class FunctionNode: ParseNode {
         }
     }
     
+    /**
+     * Returns a string representation of the function node.
+     
+     This method provides a simple description of the function node, which is
+     useful for debugging and logging purposes.
+     
+     - Returns: A string representation of the function node.
+     */
     var description: String {
         let args = children.map { String(describing: $0) }.joined(separator: " ")
         return "(\(value) \(args))"
     }
     
+    /**
+     * Creates a copy of the function node and its children.
+     
+     This method creates a deep copy of the function node, including all its
+     children nodes. It is useful for creating new instances of the parse tree
+     without modifying the original structure.
+     
+     - Returns: A new FunctionNode instance that is a copy of the original.
+     */
     func copy() -> ParseNode {
         let copiedChildren = children.map { $0.copy() }
         return FunctionNode(value: self.value, children: copiedChildren)
@@ -411,15 +546,37 @@ class FunctionNode: ParseNode {
 }
 
 /**
- * A parse tree, representing a mathematical expression in a tree structure.
+ * A parse tree representing a mathematical expression.
+ *
+ * This class manages the structure of the parse tree, including the root node,
+ * and provides methods for generating, evaluating, and mutating the tree.
  */
 class ParseTree: CustomStringConvertible {
     var root: FunctionNode
     
+    /**
+     * Initializes a parse tree with a given root node.
+     
+     - Parameters:
+        - root: The root node of the parse tree.
+     */
     init(root: FunctionNode) {
         self.root = root
     }
     
+    /**
+     * Generates a parse tree using the full method.
+     
+     This method creates a parse tree with a specified maximum depth and
+     no probability of generating terminal nodes.
+     
+     - Parameters:
+        - functionSet: Array of function names to be used in the parse tree.
+        - terminalRules: The rules for generating terminal nodes.
+        - depth: Maximum depth of the tree.
+     
+     - Returns: A new ParseTree instance.
+     */
     static func generateFull(
         functionSet: [String], 
         terminalRules: TerminalGenerationRules, 
@@ -434,6 +591,20 @@ class ParseTree: CustomStringConvertible {
         return ParseTree(root: root)
     }
     
+    /**
+     * Generates a parse tree using the grow method.
+     
+     This method creates a parse tree with a specified maximum depth and
+     a probability of generating terminal nodes.
+     
+     - Parameters:
+        - functionSet: Array of function names to be used in the parse tree.
+        - terminalRules: The rules for generating terminal nodes.
+        - depth: Maximum depth of the tree.
+        - terminalProb: Probability of generating a terminal node.
+     
+     - Returns: A new ParseTree instance.
+     */
     static func generateGrow(
         functionSet: [String], 
         terminalRules: TerminalGenerationRules, 
@@ -449,15 +620,41 @@ class ParseTree: CustomStringConvertible {
         return ParseTree(root: root)
     }
     
+    /**
+     * Evaluates the parse tree with given variable values.
+     
+     This method traverses the parse tree and evaluates it based on the provided
+     variable values. It returns the result of the evaluation.
+     
+     - Parameters:
+        - variableValues: A dictionary mapping variable names to their values.
+     
+     - Returns: The result of evaluating the parse tree.
+     */
     func evaluate(variableValues: [String: Double]) -> Double {
         return root.evaluate(variableValues: variableValues)
     }
     
+    /**
+     * Returns a string representation of the parse tree.
+     
+     This method provides a simple description of the parse tree, which is
+     useful for debugging and logging purposes.
+     
+     - Returns: A string representation of the parse tree.
+     */
     var description: String {
         return String(describing: root)
     }
     
-    // Pretty print for better visualization 
+    /**
+     * Pretty prints the parse tree in a human-readable format.
+     
+     This method recursively traverses the parse tree and formats it as a string,
+     showing the structure of the tree with indentation and branch lines.
+     
+     - Returns: A string representation of the parse tree.
+     */
     func prettyPrint() -> String {
         func recurse(node: ParseNode, prefix: String, isTail: Bool) -> String {
             let prefix1 = isTail ? "└── " : "├── "
@@ -478,7 +675,15 @@ class ParseTree: CustomStringConvertible {
         return recurse(node: root, prefix: "", isTail: true)
     }
     
-    // Helper function to get all nodes in the tree
+    /**
+     * Returns all nodes in the parse tree along with their parents.
+     
+     This method traverses the parse tree and collects all nodes along with their
+     parent nodes. It returns an array of tuples, where each tuple contains a node
+     and its parent.
+     
+     - Returns: An array of tuples containing nodes and their parents.
+     */
     private func getAllNodes() -> [(node: ParseNode, parent: ParseNode?)] {
         var nodes: [(node: ParseNode, parent: ParseNode?)] = []
         
@@ -495,7 +700,18 @@ class ParseTree: CustomStringConvertible {
         return nodes
     }
     
-    // Get a random node from the tree
+    /**
+     * Returns a random node from the parse tree.
+     
+     This method can return a random node of any type (leaf or internal) based on the
+     specified nodeType parameter. If no nodes of the specified type are found, it
+     raises a fatal error.
+     
+     - Parameters:
+        - nodeType: Type of node to return ("any", "leaf", "internal")
+     
+     - Returns: A tuple containing the selected node and its parent.
+     */
     func getRandomNode(nodeType: String = "any") -> (node: ParseNode, parent: ParseNode?) {
         let allNodes = getAllNodes()
         var filteredNodes: [(node: ParseNode, parent: ParseNode?)] = []
@@ -519,12 +735,32 @@ class ParseTree: CustomStringConvertible {
         return filteredNodes[randomIndex]
     }
     
-    // Make a deep copy of the tree
+    /**
+     * Creates a deep copy of the parse tree.
+     
+     This method creates a new instance of the parse tree with the same structure
+     and values as the original tree.
+     
+     - Returns: A new ParseTree instance that is a copy of the original.
+     */
     func copy() -> ParseTree {
         return ParseTree(root: root.copy() as! FunctionNode)
     }
     
-    // Mutation: Replace a random subtree with a new randomly generated subtree
+    /**
+     * Mutate the parse tree by replacing a random subtree with a new one.
+     
+     This method replaces a randomly selected subtree in the parse tree with
+     a new subtree generated from the provided function set and terminal rules.
+     
+     - Parameters:
+        - functionSet: Array of function names to be used in the new subtree.
+        - terminalRules: The rules for generating new terminal nodes.
+        - maxDepth: Maximum depth for the new subtree.
+        - terminalProb: Probability of generating a terminal node.
+     
+     - Returns: A new parse tree with the mutated subtree.
+     */
     func mutate(
         functionSet: [String],
         terminalRules: TerminalGenerationRules,
@@ -554,7 +790,17 @@ class ParseTree: CustomStringConvertible {
         return mutatedTree
     }
     
-    // Mutation: Replace a random terminal node
+    /**
+     * Point mutation: Replace a random terminal node with a new terminal node.
+     
+     This method replaces a randomly selected terminal node in the parse tree with
+     a new terminal node generated from the provided terminal rules.
+     
+     - Parameters:
+        - terminalRules: The rules for generating new terminal nodes.
+     
+     - Returns: A new parse tree with the mutated terminal node.
+     */
     func pointMutate(terminalRules: TerminalGenerationRules) -> ParseTree {
         let mutatedTree = self.copy()
         let (nodeToReplace, parent) = mutatedTree.getRandomNode(nodeType: "leaf")
@@ -575,7 +821,18 @@ class ParseTree: CustomStringConvertible {
         return mutatedTree
     }
     
-    // Crossover: Swap subtrees between two parse trees
+    /**
+     * Crossover between two parse trees.
+     
+     This method performs crossover between two parent parse trees, creating a child tree
+     by replacing a random subtree in the first parent with a random subtree from the second parent.
+     
+     - Parameters:
+        - parent1: The first parent parse tree.
+        - parent2: The second parent parse tree.
+     
+     - Returns: A new parse tree representing the child created from the crossover.
+     */
     static func crossover(parent1: ParseTree, parent2: ParseTree) -> ParseTree {
         let child = parent1.copy()
         let (node1, parent1Node) = child.getRandomNode()
@@ -1078,20 +1335,18 @@ extension GeneticProgramming {
     }
 }
 
-/**
- * A structure that encapsulates the results of a benchmark operation.
- *
- * This struct stores performance metrics and other data collected during benchmarking.
- * It conforms to `Codable` to enable serialization and deserialization of benchmark
- * results, allowing them to be stored or transferred as needed.
- *
- * Use this structure to maintain consistent representation of benchmark data
- * throughout the application and for data persistence.
- */
+/// A structure to hold benchmark results.
 struct BenchmarkResult: Codable {
+    /// The parameter name (e.g., "Population Size", "Generations").
     let parameter: String
+
+    /// The value of the parameter (e.g., population size or generation count).
     let value: Int
+    
+    /// The execution time in seconds.
     let time: Double
+    
+    /// The accuracy achieved during the benchmark.
     let accuracy: Double
 }
 
