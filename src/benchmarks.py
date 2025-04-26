@@ -386,7 +386,7 @@ def run_benchmarks():
         plt.grid(True)
         
         plt.tight_layout()
-        plt.savefig('../data/python_benchmarks.png')
+        plt.savefig('../docs/img/python_benchmarks.png')
         plt.close()
     except Exception as e:
         print(f"Error creating plots: {str(e)}")
