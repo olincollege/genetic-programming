@@ -364,30 +364,61 @@ def run_benchmarks():
         results_df = pd.DataFrame(results)
         results_df.to_csv('../data/python_gp_benchmarks.csv', index=False)
         
-        # Plot results
+        # Ensure output directory exists
+        os.makedirs('../docs/img', exist_ok=True)
+        
+        # Get filtered data
+        pop_results = results_df[results_df['parameter'] == 'Population Size']
+        gen_results = results_df[results_df['parameter'] == 'Generations']
+        
+        # Plot runtime results
         plt.figure(figsize=(12, 6))
         
         # Plot population size benchmarks
-        pop_results = results_df[results_df['parameter'] == 'Population Size']
         plt.subplot(1, 2, 1)
-        plt.plot(pop_results['value'], pop_results['time'], 'o-', label='Execution Time')
+        plt.plot(pop_results['value'], pop_results['time'], 'o-', color='#306998', label='Execution Time')
         plt.xlabel('Population Size')
         plt.ylabel('Time (seconds)')
         plt.title('Execution Time vs Population Size')
         plt.grid(True)
         
         # Plot generation benchmarks
-        gen_results = results_df[results_df['parameter'] == 'Generations']
         plt.subplot(1, 2, 2)
-        plt.plot(gen_results['value'], gen_results['time'], 'o-', label='Execution Time')
+        plt.plot(gen_results['value'], gen_results['time'], 'o-', color='#306998', label='Execution Time')
         plt.xlabel('Generations')
         plt.ylabel('Time (seconds)')
         plt.title('Execution Time vs Generations')
         plt.grid(True)
         
+        plt.suptitle('Python Genetic Programming: Runtime Performance', fontsize=14)
         plt.tight_layout()
         plt.savefig('../docs/img/python_benchmarks.png')
         plt.close()
+        
+        # Plot accuracy results
+        plt.figure(figsize=(12, 6))
+        
+        # Plot population size vs accuracy
+        plt.subplot(1, 2, 1)
+        plt.plot(pop_results['value'], pop_results['accuracy'], 'o-', color='#306998', label='Accuracy')
+        plt.xlabel('Population Size')
+        plt.ylabel('Accuracy')
+        plt.title('Accuracy vs Population Size')
+        plt.grid(True)
+        
+        # Plot generations vs accuracy
+        plt.subplot(1, 2, 2)
+        plt.plot(gen_results['value'], gen_results['accuracy'], 'o-', color='#306998', label='Accuracy')
+        plt.xlabel('Generations')
+        plt.ylabel('Accuracy')
+        plt.title('Accuracy vs Generations')
+        plt.grid(True)
+        
+        plt.suptitle('Python Genetic Programming: Classification Accuracy', fontsize=14)
+        plt.tight_layout()
+        plt.savefig('../docs/img/python_accuracy.png')
+        plt.close()
+        
     except Exception as e:
         print(f"Error creating plots: {str(e)}")
     
@@ -398,4 +429,6 @@ if __name__ == "__main__":
     benchmark_results = run_benchmarks()
     if benchmark_results is not None:
         print("\nBenchmark results saved to '../data/python_gp_benchmarks.csv'")
-        print("Benchmark plots saved to '../data/python_benchmarks.png'")
+        print("Benchmark plots saved to:")
+        print("- '../docs/img/python_benchmarks.png' (Runtime)")
+        print("- '../docs/img/python_accuracy.png' (Accuracy)")
