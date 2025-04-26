@@ -104,7 +104,7 @@ class ParameterSweep:
                 ]
                 acc = accuracy_score(test_df["Species"], preds)
                 accuracies.append(acc)
-                print(f"Accuracy: {acc}")
+                # print(f"Accuracy: {acc}")
 
             avg_acc = sum(accuracies) / len(accuracies)
             results.append({"param": param_name, "value": val, "accuracy": avg_acc})
@@ -132,4 +132,5 @@ class ParameterSweep:
             plt.xlabel(param)
             plt.ylabel("Accuracy")
             plt.tight_layout()
+            plt.ylim(0.45, 0.65)
             plt.show()
