@@ -139,7 +139,7 @@ class IrisGP:
         generations: int,
         crossover_rate: float,
         mutation_rate: float,
-        num_champions_to_survive: int,
+        champion_survival_percentage: int,
         train_df: pd.DataFrame,
     ) -> tuple[ParseTree, float, list[float]]:
         """
@@ -153,7 +153,7 @@ class IrisGP:
                 from zero to one.
             mutation_rate (float): The probability of mutation in the offspring
                 from zero to one.
-            num_champions_to_survive (int): The number of best performing
+            champion_survival_percentage (int): The percentage of best performing
                 individuals that move onto the next generation.
             train_df (pd.DataFrame): The portion of the dataset for training.
 
@@ -167,7 +167,7 @@ class IrisGP:
         best_individual = None
         fitness_history = []
         fitness_cache = FitnessCache(train_df)
-
+        num_champions_to_survive = int(population_size * champion_survival_percentage)
         for _ in range(generations):
             # Let n best individuals survive to the next generation as parents
             champions: list[ParseTree] = sorted(
