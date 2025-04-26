@@ -12,6 +12,16 @@ class IrisGP:
     """
     Classifier for the Iris dataset using Genetic Programming.
 
+    Constants:
+        THRESHOLD_LOW (float): The low threshold for classification.
+        THRESHOLD_HIGH (float): The high threshold for classification.
+
+        Classification is based on comparing the output of the parse tree
+        to the thresholds:
+            res < THRESHOLD_LOW                     --> Iris-setosa
+            THRESHOLD_LOW <= res < THRESHOLD_HIGH   --> Iris-versicolor
+            res >= THRESHOLD_HIGH                   --> Iris-virginica
+
     Attributes:
         function_set (list[str]): The set of functions for parse trees to use.
         terminal_rules (TerminalGenerationRules): The rules for generating
@@ -21,6 +31,9 @@ class IrisGP:
         terminal_prob (float): The probability of a node being a terminal node.
             Expected to be between 0 and 1.
     """
+
+    THRESHOLD_LOW = 0.33
+    THRESHOLD_HIGH = 0.66
 
     def __init__(
         self,
@@ -53,17 +66,11 @@ class IrisGP:
         return fitness
 
     @staticmethod
-    def evaluate_row(
-        individual: ParseTree, row: pd.Series, t1=0.33, t2=0.66
-    ) -> tuple[bool, float]:
+    def evaluate_row(individual: ParseTree, row: pd.Series) -> tuple[bool, float]:
         """
         Checks if the individual (parse tree) classifies a row correctly.
-
-        The classification is based on comparing the output of the parse tree
-        to a threshold value:
-            res < t1     --> Iris-setosa
-            t1 <= res < t2 --> Iris-versicolor
-            res >= t2    --> Iris-virginica
+        Classification is based comparing the output of the parse tree
+        to the thresholds (see class docstring above).
 
         This function assumes the variables in the parse tree have the same
         names as the columns in the row.
@@ -80,9 +87,9 @@ class IrisGP:
             float: The output of the parse tree for the given row.
         """
         res = individual.evaluate(dict(row))
-        if res < t1:
+        if res < IrisGP.THRESHOLD_LOW:
             predicted = "Iris-setosa"
-        elif res < t2:
+        elif res < IrisGP.THRESHOLD_HIGH:
             predicted = "Iris-versicolor"
         else:
             predicted = "Iris-virginica"
@@ -174,7 +181,7 @@ class IrisGP:
                 if random.random() < crossover_rate:
                     # `crossover_rate` is the probability of crossover
                     child, _ = GeneticOperators.crossover(parent1, parent2)
-                    offspring.append(child)
+                    offspring.append(deepcopy(child))
                 else:
                     # If no crossover, just clone one of the parents
                     offspring.append(deepcopy(parent1))
@@ -237,22 +244,28 @@ class FitnessCache:
 
     def __init__(self, train_df: pd.DataFrame):
 
-        # Initialize None to -inf so a best individual of None is always overridden
-        self.map = {None: float("-inf")}
+        self.map = {}
         self.train_df = train_df
 
-    def __getitem__(self, key: ParseTree) -> float:
+    def __getitem__(self, tree: ParseTree) -> float:
         """
         Returns the fitness score for a given individual.
         Evaluates the fitness if not already calculated.
 
         Args:
-            key (list): The schedule to evaluate
+            tree (ParseTree): The tree to get the fitness of.
 
         Returns (float): The fitness score of the individual
         """
+        # Map None to -inf so a best individual of None is always overridden
+        if tree is None:
+            return float("-inf")
+
+        # Could change this to `key = repr(tree)` for more correct hashing,
+        # however it slows down the runtime by 3x, so this works good enough.
+        key = tree
         if key not in self.map:
-            self.map[key] = IrisGP.evaluate_fitness(key, self.train_df)
+            self.map[key] = IrisGP.evaluate_fitness(tree, self.train_df)
         return self.map[key]
 
 

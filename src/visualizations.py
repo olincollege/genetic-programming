@@ -24,9 +24,9 @@ class Visualizations:
             correctness, res = IrisGP.evaluate_row(self.parse_tree, row)
             test_results.at[idx, "Correct"] = correctness
             test_results.at[idx, "PredictedValue"] = res
-            if res < 0.33:  # TODO: get rid of magic number
+            if res < IrisGP.THRESHOLD_LOW:
                 species = "Iris-setosa"
-            elif res < 0.66:  # TODO: get rid of magic number
+            elif res < IrisGP.THRESHOLD_HIGH:
                 species = "Iris-versicolor"
             else:
                 species = "Iris-virginica"
