@@ -33,11 +33,7 @@ class ParameterSweep:
     }
 
     @staticmethod
-    def sweep_all_parameters(
-        param_grid,
-        train_df,
-        test_df,
-    ):
+    def sweep_all_parameters(param_grid, train_df, test_df, iterations=10):
         """
         Sweep through the parameter grid and evaluate the GP model.
         Args:
@@ -46,6 +42,7 @@ class ParameterSweep:
             lists of the parameters.
             train_df: Training DataFrame.
             test_df: Testing DataFrame.
+            iterations: Number of iterations for averaging.
         Returns:
             DataFrame with results.
         """
@@ -56,16 +53,14 @@ class ParameterSweep:
                 values,
                 train_df,
                 test_df,
+                iterations=iterations,
             )
             out = pd.concat([out, results])
         return out
 
     @staticmethod
     def sweep_single_parameter(
-        param_name,
-        param_values,
-        train_df,
-        test_df,
+        param_name, param_values, train_df, test_df, iterations=10
     ):
         """
         Sweep through a single parameter and evaluate the GP model.
@@ -74,6 +69,7 @@ class ParameterSweep:
             param_values: List of values for the parameter.
             train_df: Training DataFrame.
             test_df: Testing DataFrame.
+            iterations: Number of iterations for averaging.
         Returns:
             DataFrame with results.
         """
@@ -87,7 +83,7 @@ class ParameterSweep:
             params[param_name] = val
 
             accuracies = []
-            for _ in range(3):  # multiple trials for averaging
+            for _ in range(iterations):  # multiple trials for averaging
                 gp = IrisGP(
                     params["function_set"],
                     params["terminal_rules"],
