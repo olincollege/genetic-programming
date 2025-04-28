@@ -131,6 +131,11 @@ class ParameterSweep:
             plt.ylabel("Accuracy")
             plt.tight_layout()
             plt.ylim(0.75, 1)
+
+            if param == "mutation_rate":
+                plt.xscale("log")
+                plt.xticks([0.005, 0.01, 0.05, 0.1])
+                plt.gca().get_xaxis().set_major_formatter(plt.ScalarFormatter())
             plt.show()
 
     @staticmethod
