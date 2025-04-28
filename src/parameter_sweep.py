@@ -134,7 +134,8 @@ class ParameterSweep:
 
             if param == "mutation_rate":
                 plt.xscale("log")
-
+                plt.xticks([0.005, 0.01, 0.05, 0.1])
+                plt.gca().get_xaxis().set_major_formatter(plt.ScalarFormatter())
             plt.show()
 
     @staticmethod
