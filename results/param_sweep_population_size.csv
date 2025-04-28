@@ -1,0 +1,6 @@
+param,value,accuracy
+population_size,20,0.8566666666666668
+population_size,40,0.8933333333333335
+population_size,60,0.9166666666666667
+population_size,80,0.93
+population_size,100,0.95

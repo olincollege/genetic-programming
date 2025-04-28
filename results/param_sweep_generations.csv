@@ -1,0 +1,5 @@
+param,value,accuracy
+generations,10,0.8433333333333334
+generations,30,0.9433333333333336
+generations,50,0.93
+generations,70,0.9500000000000002
