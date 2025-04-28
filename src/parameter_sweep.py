@@ -98,11 +98,7 @@ class ParameterSweep:
                     champion_survival_percentage=params["champion_survival_percentage"],
                     train_df=train_df,
                 )
-                preds = [
-                    IrisGP.tree_to_class(best_tree, row)
-                    for _, row in test_df.iterrows()
-                ]
-                acc = accuracy_score(test_df["Species"], preds)
+                acc = IrisGP.evaluate_fitness(best_tree, test_df) / len(test_df)
                 accuracies.append(acc)
                 # print(f"Accuracy: {acc}")
 
