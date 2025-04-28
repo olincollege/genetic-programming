@@ -94,4 +94,5 @@ class Visualizations:
         plt.xlabel("Predicted Species")
         plt.ylabel("Actual Species")
         plt.title("GP Predicted Species Confusion Matrix")
+        plt.grid(False)
         plt.show()
