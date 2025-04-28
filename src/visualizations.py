@@ -1,9 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
-from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report, accuracy_score
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from parse_tree import *
 from genetic_programming import IrisGP
@@ -94,4 +93,15 @@ class Visualizations:
         plt.xlabel("Predicted Species")
         plt.ylabel("Actual Species")
         plt.title("GP Predicted Species Confusion Matrix")
+        plt.grid(False)
         plt.show()
+
+    def print_classification_report(self):
+        """
+        Print sklearn classification report and accuracy score.
+        """
+        y_true = self.test_results["Species"].tolist()
+        y_pred = self.test_results["PredictedSpecies"].tolist()
+        print("Accuracy:", accuracy_score(y_true, y_pred))
+        print("\nClassification Report:")
+        print(classification_report(y_true, y_pred))

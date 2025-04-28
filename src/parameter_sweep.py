@@ -37,9 +37,10 @@ class ParameterSweep:
         """
         Sweep through the parameter grid and evaluate the GP model.
         Args:
-            param_grid: Dictionary of parameters to sweep keys include population_size, generations,
-            crossover_rate, mutation_rate, champion_survival_percentage and the values are the
-            lists of the parameters.
+            param_grid: Dictionary of parameters to sweep. Keys include
+                population_size, generations, crossover_rate, mutation_rate,
+                champion_survival_percentage, and max_depth. Values are the
+                lists of the parameters.
             train_df: Training DataFrame.
             test_df: Testing DataFrame.
             iterations: Number of iterations for averaging.
@@ -98,11 +99,7 @@ class ParameterSweep:
                     champion_survival_percentage=params["champion_survival_percentage"],
                     train_df=train_df,
                 )
-                preds = [
-                    IrisGP.tree_to_class(best_tree, row)
-                    for _, row in test_df.iterrows()
-                ]
-                acc = accuracy_score(test_df["Species"], preds)
+                acc = IrisGP.evaluate_fitness(best_tree, test_df) / len(test_df)
                 accuracies.append(acc)
                 # print(f"Accuracy: {acc}")
 
@@ -118,9 +115,10 @@ class ParameterSweep:
         """
         Plot the results of the parameter sweep.
         Args:
-            param_grid: Dictionary of parameters to sweep keys include population_size, generations,
-            crossover_rate, mutation_rate, num_champions_to_survive and the values are the
-            lists of the parameters.
+            param_grid: Dictionary of parameters to sweep. Keys include
+                population_size, generations, crossover_rate, mutation_rate,
+                champion_survival_percentage, and max_depth. Values are the
+                lists of the parameters.
             df: DataFrame with the parameter sweep results.
         """
         sns.set_theme(style="whitegrid")
@@ -132,5 +130,29 @@ class ParameterSweep:
             plt.xlabel(param)
             plt.ylabel("Accuracy")
             plt.tight_layout()
-            plt.ylim(0.45, 0.65)
+            plt.ylim(0.75, 1)
+
+            if param == "mutation_rate":
+                plt.xscale("log")
+                plt.xticks([0.005, 0.01, 0.05, 0.1])
+                plt.gca().get_xaxis().set_major_formatter(plt.ScalarFormatter())
             plt.show()
+
+    @staticmethod
+    def load_from_csv(results_path: str, param_grid: dict) -> pd.DataFrame:
+        """
+        Load parameter sweep results from CSV files and concatenate into a
+        single DataFrame.
+
+        Args:
+            results_path: Path to the directory containing the CSV files.
+            param_grid: Dictionary of parameters to sweep. Keys include
+                population_size, generations, crossover_rate, mutation_rate,
+                champion_survival_percentage, and max_depth. Values are the
+                lists of the parameters.
+        """
+        out = pd.DataFrame()
+        for param_name in param_grid.keys():
+            df = pd.read_csv(f"{results_path}/param_sweep_{param_name}.csv")
+            out = pd.concat([out, df])
+        return out
