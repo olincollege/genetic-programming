@@ -255,19 +255,21 @@ chosen to swept. These values are:
 
 ## Analysis
 
-To further analyze which versicolor was predicted as virginica from our result,
-we plotted all irises by the dimensions of various parts of the flower. In the
-first graph, they are plotted based on the length and width of the petal. In the
-second graph, they are plotted based on the length and width of the sepal.
-Points are colored based on the species that the best program predicted them to
-be. The correct predictions are smaller and transparent, while the incorrect
-predictions are larger and opaque.
+To further analyze which versicolors were incorrectly classified as virginicas,
+we plotted all irises of the test set by petal and by sepal dimension. Points
+are colored based on the species that the best program predicted them to be. The
+correct predictions are smaller and transparent, while the incorrect predictions
+are larger and opaque.
 
 When looking at petal dimension, we can see that the two versicolors that were
 incorrectly classified as virginicas are towards the cluster of other
-virginicas. Furthermore, when looking at sepal dimension, we can see that the
-two misclassified versicolors are actually within the cluster of virginicas.
+virginicas.
+
 ![Predicted Species by Petal Dimensions](docs/img/predicted_species_petal.png)
+
+When looking at sepal dimension, we can see that the two misclassified
+versicolors are actually within the cluster of virginicas.
+
 ![Predicted Species by Sepal Dimensions](docs/img/predicted_species_sepal.png)
 
 From these results, we were able to make sure that our program is not only
@@ -276,50 +278,51 @@ sense even visually.
 
 ### Parameter Sweep Analysis
 
-![Sweep Population Size](docs/img/sweep_population_size.png) The first sweep was
-on the population size from 20 populations to a hundred, it roughly showed a
-stable increase from about 0.85 to about 0.95. From this result, we can see that
-the more the population size, the higher the accuracy is and we can assume that
-it might even show a further increase as we increase the population size. This
-result corresponded to our initial assumption that there would be a better
-result if we increased our population size.
+![Sweep Population Size](docs/img/sweep_population_size.png)
 
-![Sweep Generations](docs/img/sweep_generations.png) The second sweep was on the
-number of generations from 10 to 70. Overall, we see an increase in accuracy
-from approximately 0.84 to approximately 0.95 as the number of generations was
-increased. In this case, we see a rapid increase in accuracy from 10 to 30
-generations, then a small decrease at 50 generations, then improving again at 70
-generations. Although there is the slight dip around 50 generations, the overall
-trend is that increasing the number of generations seems to improve model
-performance. This finding affirms our original hypothesis that the more
-generations used, the more evolutionary optimization could be done and hence the
-more accurate.
+The first sweep was on the population size from 20 populations to 100, it
+roughly showed a stable increase in accuracy from about 0.85 to about 0.95. We
+can see that increased population size leads to increased accuracy, an
+understandable result as a larger population gives a higher chance to evolve a
+successful program.
 
-![Sweep Crossover Rate](docs/img/sweep_crossover_rate.png) The third sweep
-examined the effect of modifying the crossover rate from 0.6 to 1.0. There was a
-continued improvement in accuracy as the crossover rate increased up to an
-accuracy of approximately 0.93 when the crossover rate was set at 0.9. When the
-crossover rate was constrained closer to 1.0, however, the accuracy declined all
-the way back down to approximately 0.88. This suggests that while increasing the
-crossover rate generally increases accuracy, doing crossover all the time could
-potentially decrease performance. This result aligns with our intuition and our
-initial research that crossover helps exploration of better solutions, but it
-also suggests that there is a need to balance crossover and mutation so that
-over-exploration and loss of diversity are avoided.
+![Sweep Generations](docs/img/sweep_generations.png)
 
-![Sweep Mutation Rate](docs/img/sweep_mutation_rate.png) The fourth sweep
-experimented with the effect of altering the mutation rate from 0.0 to 0.5. We
-observed that introducing a small amount of mutation (approximately 0.005)
-caused a significant boost in accuracy, from approximately 0.81 to nearly 0.90.
-But as the mutation rate increased further beyond this, accuracy gradually
-declined. This suggests that some level of mutation is helpful to provide
-diversity and avoid premature convergence, but a very high level of mutation
-disrupts the optimization process and leads to suboptimal performance. These
-results confirm our initial research that mutation rate with a significantly
-small number (less than 1%) usually gives the best outcome.
+The second sweep was on the number of generations from 10 to 70. We see large
+initial increase in accuracy, from around 0.85 to 0.95, between 10 and 30
+generations. There is then a small decrease at 50 generations, then an increase
+at 70 generations. Despite the slight dip at 50 generations, the overall trend
+is that increasing the number of generations seems to improve model performance.
+This similarly makes sense as more generations allow for more chance to evolve a
+successful program, but it may begin to see diminishing returns as the
+population converges on a solution.
 
-![Sweep Champion Survival](docs/img/sweep_champion_survival_percentage.png) The
-fifth sweep examined the effect of altering the champion survival percentage
+![Sweep Crossover Rate](docs/img/sweep_crossover_rate.png)
+
+The third sweep examined the effect of modifying the crossover rate from 0.6 to
+1.0. There was a continued improvement in accuracy as the crossover rate
+increased up to an accuracy of approximately 0.93 when the crossover rate was
+set at 0.9. When the crossover rate was constrained closer to 1.0, however, the
+accuracy declined all the way back down to approximately 0.88. This suggests
+that while increasing the crossover rate generally increases accuracy, a 100%
+chance of crossover could potentially decrease performance. This result aligns
+with our intuition and our initial research that crossover helps exploration of
+better solutions, but it also suggests that there is a need to balance crossover
+and mutation so that over-exploration and loss of diversity are avoided.
+
+![Sweep Mutation Rate](docs/img/sweep_mutation_rate.png)
+
+The fourth sweep experimented with the effect of altering the mutation rate from
+0.0 to 0.1. We observed that accuracy was highest when mutation rate was lowest
+(0% and 0.5%), and any increase to mutation rate led to a decrease in accuracy.
+This shows that mutation in our application more so disrupts the optimization
+process then helping to explore a wider solution space. This may be because our
+classification had a fairly straightforward solution, and didn't have many local
+optima that mutation would help escape from.
+
+![Sweep Champion Survival](docs/img/sweep_champion_survival_percentage.png)
+
+The fifth sweep examined the effect of altering the champion survival percentage
 from 0.0 to 0.5. Interestingly, the findings showed some fluctuation rather than
 a clear upward or downward trend. Accuracy was very high at 0.0 survival (around
 0.88), but decreased when survival percentages of 0.1 and 0.2 were employed.
@@ -330,16 +333,17 @@ and improve performance, but too little or poorly tuned survival percentages can
 be detrimental. Overall, the findings indicate that accurate tuning of champion
 survival is necessary for optimal performance.
 
-![Sweep Max Depth](docs/img/sweep_max_depth.png) The sixth and our last sweep
-took into account the maximum depth of trees ranging from 1 to 4. As the maximum
-depth increased from 1 to 3, the accuracy consistently increased to the peak of
-around 0.93 at depth 3. However, with the subsequent increase in the depth to 4,
-the accuracy fell dramatically to around 0.87. This trend demonstrates that
-allowing for deeper trees early on increases model expressiveness and leads to
-better performance, but beyond some point, deeper trees can lead to overfitting
-or unnecessary complexity, ultimately hurting generalization. This result aligns
-with the common intuition that deeper structures can capture more complex
-patterns at the cost of overfitting.
+![Sweep Max Depth](docs/img/sweep_max_depth.png)
+
+The sixth and our last sweep took into account the maximum depth of trees
+ranging from 1 to 4. As the maximum depth increased from 1 to 3, the accuracy
+consistently increased to the peak of around 0.93 at depth 3. However, with the
+subsequent increase in the depth to 4, the accuracy fell dramatically to around
+0.87. This trend demonstrates that allowing for deeper trees early on increases
+model expressiveness and leads to better performance, but beyond some point,
+deeper trees can lead to overfitting or unnecessary complexity, ultimately
+hurting generalization. This result aligns with the common intuition that deeper
+structures can capture more complex patterns at the cost of overfitting.
 
 ### Multi-Language Implementation Comparison
 
