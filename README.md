@@ -101,7 +101,33 @@ The genetic programming algorithm performs the following steps:
 4. The new population of champions and offspring all have a chance to mutate
 5. Repeat from #2 for a number of generations
 
+#### Classification
+
+Parse trees classified the three irises by taking sepal length, sepal width,
+petal length, petal width and outputting a single number, $`A`$. The value of
+$`A`$ is converted to a species via the following inequalities:
+
+$$
+\begin{cases}
+A < 0.33 & \rightarrow \text{Setosa} \\
+0.33 \leq A < 0.66 & \rightarrow \text{Versicolor} \\
+0.66 \leq A & \rightarrow \text{Virginica} \\
+\end{cases}
+$$
+
+The thresholds of 0.33 and 0.66 were arbitrarily defined and other thresholds
+would work similarly well. While these thresholds in a sense expect $`A`$ values
+from 0-1, there is no constraint limiting output to that range, though programs
+that produce outputs around that range will naturally perform better and thus
+persist in the survival of the fittest. If thresholds of 50 and 100 were
+selected, then the best performing parse trees would be those that produce
+output on that magnitude.
+
 #### Fitness function
+
+The fitness of each parse tree was evaluated by having the given tree attempt to
+classify all irises in the training portion of the dataset (a random 80% of the
+original dataset). Each iris that would add 1 to an individual’s fitness.
 
 #### Initial Population Generation
 
