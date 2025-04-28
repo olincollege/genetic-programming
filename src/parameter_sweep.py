@@ -37,9 +37,10 @@ class ParameterSweep:
         """
         Sweep through the parameter grid and evaluate the GP model.
         Args:
-            param_grid: Dictionary of parameters to sweep keys include population_size, generations,
-            crossover_rate, mutation_rate, champion_survival_percentage and the values are the
-            lists of the parameters.
+            param_grid: Dictionary of parameters to sweep. Keys include
+                population_size, generations, crossover_rate, mutation_rate,
+                champion_survival_percentage, and max_depth. Values are the
+                lists of the parameters.
             train_df: Training DataFrame.
             test_df: Testing DataFrame.
             iterations: Number of iterations for averaging.
@@ -114,9 +115,10 @@ class ParameterSweep:
         """
         Plot the results of the parameter sweep.
         Args:
-            param_grid: Dictionary of parameters to sweep keys include population_size, generations,
-            crossover_rate, mutation_rate, num_champions_to_survive and the values are the
-            lists of the parameters.
+            param_grid: Dictionary of parameters to sweep. Keys include
+                population_size, generations, crossover_rate, mutation_rate,
+                champion_survival_percentage, and max_depth. Values are the
+                lists of the parameters.
             df: DataFrame with the parameter sweep results.
         """
         sns.set_theme(style="whitegrid")
@@ -128,5 +130,24 @@ class ParameterSweep:
             plt.xlabel(param)
             plt.ylabel("Accuracy")
             plt.tight_layout()
-            plt.ylim(0.45, 0.65)
+            plt.ylim(0.75, 1)
             plt.show()
+
+    @staticmethod
+    def load_from_csv(results_path: str, param_grid: dict) -> pd.DataFrame:
+        """
+        Load parameter sweep results from CSV files and concatenate into a
+        single DataFrame.
+
+        Args:
+            results_path: Path to the directory containing the CSV files.
+            param_grid: Dictionary of parameters to sweep. Keys include
+                population_size, generations, crossover_rate, mutation_rate,
+                champion_survival_percentage, and max_depth. Values are the
+                lists of the parameters.
+        """
+        out = pd.DataFrame()
+        for param_name in param_grid.keys():
+            df = pd.read_csv(f"{results_path}/param_sweep_{param_name}.csv")
+            out = pd.concat([out, df])
+        return out
