@@ -216,9 +216,8 @@ section.
 
 ### Parameter Sweep
 
-We tried improving our result(accuracy) by running a parameter sweep. We sweeped
-the parameters that goes in to the genetic programming algorithm and saw how
-each of the parameters impacted our accuracy of the best program. For each set
+To understand how each parameter of the genetic programming algorithm impacts
+the accuracy of the best program, we performed a parameter sweep. For each set
 of unique parameters, the program was run 10 times, and the average accuracy was
 taken. Default values were chosen for parameters that were not being swept,
 based on standards of literature and former trial and error when developing the
@@ -239,13 +238,13 @@ algorithm, trying to balance runtime and accuracy. The default values are:
 - `mutation_rate`: 0.1
 - `champion_survival_percentage`: 0.1
 
-Our initial research showed that the crossover rate generally should be high,
-about 80% – 90% and the mutation rate should generally be very low, about 0.5% –
-1% [4]. So, instead of having the theses parameter sweep from 0 to 1 we sweeped
-in a more reasonable range of 0.6 to 1.0 for the cross over rate and 0 to 0.005
-for the mutation rate.
+Note: We had set a rather high mutation rate of 0.1 (10%) for much of the
+development as well as for the parameter sweep. However, later research showed
+that mutation rate should be around 0.5% to 1% [4]. Rather that re-sweeping with
+1% as the default, we chose just to sweep mutation rates from 0 to 10%.
 
-The values that were swept are:
+For other parameters, values generally centered around the default value were
+chosen to swept. These values are:
 
 - `population_size`: 20, 40, 60, 80, 100
 - `generations`: 10, 30, 50, 70
@@ -253,17 +252,6 @@ The values that were swept are:
 - `mutation_rate`: 0, 0.005, 0.01, 0.05, 0.1
 - `champion_survival_percentage`: 0.1, 0.2, 0.3, 0.4, 0.5
 - `max_depth`: 1, 2, 3, 4
-
-`param_grid` is a dictionary representing the values above. The values are
-generated with `np.arange`, note that the `stop` argument (second argument) is
-exclusive, which is why the values are just greater than the max value we wish
-to sweep through. The comments to the right are the approximate time it took for
-each sweep to run, in [minutes]:[seconds].
-
-These parameter sweeps take about 50 minutes to run, so the results are saved
-and loaded from `results/parameter_sweep.csv`. We will do a more in-depth
-analysis for each of the parameter’s sweep’s results in graphs in the Analysis
-section.
 
 ## Analysis
 
