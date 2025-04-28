@@ -176,39 +176,31 @@ the parse tree is randomly replaced by a new randomly generated parse tree.
 Similarly to crossover, this operation can result in a tree that exceeds the max
 depth. ![Mutation](docs/img/mutation.png)
 
-Lastly, from the best tree we got from evolving, we used the output prediction
-in number to get the predicted species(Iris-setosa, iris-versicolor, and
-iris-virginica). We used the threshold of 0.3 and 0.8 to classify between
-(iris-setosa and iris-versicolor) and (iris-versicolor and iris-virginica). The
-threshold was manually calculated from the prediction range number output of
-each species. From there, we calculated the accuracy by comparing the true iris
-species to the predicted iris species. Although, the accuracy depended each time
-we ran the genetic program, we got the accuracy score of roughly between 0.8 to
-0.9. Below was the report from one run:
+## Results
 
-**Accuracy: 0.8333333333333334**
+The genetic programming algorithm was run for 50 generations, using
+`random.seed(2)` for reproducibility. The fittest program from this evolution
+was the following tree:
+
+![Best Tree](docs/img/best_tree.png)
+
+This parse tree had an accuracy of 93% and the following classification report:
 
 | Class            | Precision | Recall | F1-Score | Support |
 | ---------------- | :-------: | :----: | :------: | :-----: |
-| Iris-setosa      |   1.00    |  1.00  |   1.00   |    9    |
-| Iris-versicolor  |   0.67    |  1.00  |   0.80   |   10    |
-| Iris-virginica   |   1.00    |  0.55  |   0.71   |   11    |
+| Iris-setosa      |   1.00    |  1.00  |   1.00   |   10    |
+| Iris-versicolor  |   1.00    |  0.80  |   0.89   |   10    |
+| Iris-virginica   |   0.83    |  1.00  |   0.91   |   10    |
 |                  |           |        |          |         |
-| **Accuracy**     |           |        |   0.83   |   30    |
-| **Macro avg**    |   0.89    |  0.85  |   0.84   |   30    |
-| **Weighted avg** |   0.89    |  0.83  |   0.83   |   30    |
+| **Accuracy**     |    N/A    |  N/A   |   0.93   |   30    |
+| **Macro avg**    |   0.94    |  0.93  |   0.93   |   30    |
+| **Weighted avg** |   0.94    |  0.93  |   0.93   |   30    |
 
-## Results
+To further visualize the how well each species was classified, the results are
+plotted in a confusion matrix:
 
-When we ran our genetic programming we got the tree below:
-![Best Tree](docs/img/best_tree.png) Out of the 30 irises in the test set, the
-best program only incorrectly classified two of them. These two were both
-versicolors that were incorrectly classified as viriginicas. We did a more
-indepth analysis of this in the Analysis section by showing which irises were
-classified incorrectly.
+![Confusion Matrix](docs/img/confusion_matrix.png)
 
-To have an overview of what classes were classified correctly and what were not,
-we made a confusion matrix. ![Confusion Matrix](docs/img/confusion_matrix.png)
 Looking at the confusion matrix, we see again that the program properly
 classified all setosas and virginicas, but misclassified two versicolors as
 virginicas. This error in classifying versicolors makes sense, as they were the
@@ -218,6 +210,9 @@ as versicolor. Any value below under the low threshold is classified as setosa,
 and any value above the high threshold is classified as virginica. This setup
 makes it "harder" for virginicas to be classified as they have both an upper and
 lower bound.
+
+Further analysis of these incorrectly classified irises is in the _Analysis_
+section.
 
 ### Parameter Sweep
 
