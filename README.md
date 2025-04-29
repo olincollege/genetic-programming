@@ -357,19 +357,6 @@ while Swift has a strong typing, value semantics, and protocol-oriented design,
 which despite being harder to implement, delivers a more “safe” development
 environment.
 
-Accuracy: 0.8333333333333334
-
-Classification Report: precision recall f1-score support
-
-    Iris-setosa       1.00      1.00      1.00         9
-
-Iris-versicolor 0.67 1.00 0.80 10 Iris-virginica 1.00 0.55 0.71 11
-
-       accuracy                           0.83        30
-      macro avg       0.89      0.85      0.84        30
-
-weighted avg 0.89 0.83 0.83 30
-
 This comparative implementation made clear how Swift's protocols versus Python's
 class inheritance led to slightly different approaches for handling genetic
 operations. The high-level structure of each implementation can be seen below:
@@ -401,68 +388,21 @@ species. This approach simplifies the evolutionary process by transforming a
 complex three-way classification problem into three more manageable binary
 classification tasks.
 
-#### Results
-
-Our comparative implementation of genetic programming in Python and Swift showed
-many interesting findings.
-
 #### Performance Benchmarks
 
-We measured the execution time and classification accuracy across different
-population sizes and generation counts for both language implementations:
+We measured the execution time across different population sizes and generation
+counts for both language implementations:
 
 ![Genetic Programming Runtime Comparison](docs/img/gp_runtime_comparison.png)
 
 **Runtime Analysis:**
 
-- **Python** has significantly faster execution times, running approximately
-  2-5x faster than Swift
-- **Swift** shows more scaling issues as population size and generation count
-  increase
-- Both implementations show linear scaling with population size, but Swift's
-  slope is steeper
-- With generations, Swift has a near-quadratic behavior while Python shows more
-  linear growth
-
-![Genetic Programming Accuracy Comparison](docs/img/gp_accuracy_comparison.png)
-
-**Accuracy Analysis:**
-
-- **Swift** achieves consistently higher classification accuracy, particularly
-  at larger population sizes
-- The sweet spot for Swift appears to be around 100 population size and 10
-  generations, achieving nearly 80% accuracy
-- Python's accuracy performance is more erratic, with significant variability
-  between runs
-- Important to note that increasing generations doesn't consistently improve
-  accuracy in either implementation
-
-#### Implementation Efficiency Tradeoffs
-
-The benchmark results reveal a tradeoff in GP:
-
-1. **Development vs. Runtime Efficiency:**
-
-   - Python's flexible typing makes it easier to get the code done and delivers
-     quick runtimes
-   - Swift's strict typing and protocol-orientation required more upfront effort
-     and has a worse runtime performance
-
-2. **Accuracy vs. Speed:**
-
-   - Swift's implementation achieved higher accuracy at the cost of longer
-     execution times
-   - Python traded accuracy for significantly faster execution
-
-3. **Parameter Sensitivity:**
-   - Swift showed better performance with increased population diversity and
-     size
-   - Python performed better with shorter generation runs, which might point out
-     to overfitting
-
-The optimal configuration appears to be language-dependent, with Swift
-benefiting from larger populations but fewer generations, while Python performs
-adequately with smaller populations and delivers quick runtimes.
+- The **Python** implementation had slower execution times, generally taking 2x
+  longer than Swift. However it shows linear scaling with both population size
+  and generation count
+- **Swift** implementation shows more scaling issues as population size and
+  generation count increase, showing slight quadratic behavior with population
+  size, and more clear quadratic behavior with generation count.
 
 ## Next Steps
 
