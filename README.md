@@ -18,7 +18,9 @@ our problem. In tree-based GP, programs are represented as parse trees which are
 evaluated recursively to produce multivariate expressions. The terminal nodes
 (or leaf nodes) in a parse tree are variables or constants and the internal
 nodes are operators such as addition, multiplication, trigonometry function, and
-more. ![Tree based Genetic Programming](docs/img/tree_based_gp.png)
+more.
+
+![Tree based Genetic Programming](docs/img/tree_based_gp.png)
 
 Genetic programming is classically implemented in Lisp due to its prefix
 notation cleanly being able to represent parse trees [3]. However, for our
