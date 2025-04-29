@@ -406,6 +406,44 @@ counts for both language implementations:
 
 ## Next Steps
 
+### Runtime Improvement & Parameter Sweeps
+
+The biggest area we hope to improve is the runtime of our genetic programming
+algorithm. A faster runtime would allow us to perform more comprehensive
+parameter sweeps—sweeping across more values and average across more
+iterations—allowing us to gain a stronger understanding of how each parameter
+impacts the algorithm. Other parameters that we hope to evaluate are function
+set, constant generation range, and threshold. Our intuition is that there is an
+ideal ratio between constant generation range and threshold, but this theory is
+yet to be tested. Currently the greatest bottleneck in the runtime is the
+recursive evaluation of parse trees. To improve runtime we could take a more
+dynamic programming approach to how we evaluate fitness, caching specific
+branches of a parse tree, not just the tree as a whole. We could also continue
+to pursue implementations in different languages, as Python is not known for its
+speed.
+
+### Different Forms of GP Classification
+
+While two forms of classification were implemented in this project, the Python
+implementation using thresholds on a single tree, and the Swift implementation
+using a multi tree approach, the two approaches were primarily compared in terms
+of runtime. A more in depth parameter sweeping of both approaches could reveal
+strengths and weaknesses of either approach, as well as how ideal parameters
+might differ between the two. Furthermore, Espejo et al. details many different
+classification techniques for GP that we could explore [X].
+
+### More Complex Applications
+
+Finally, the most clear next direction is to apply GP to a more complex problem.
+This was ultimately an exploration of the topic and a proof of concept, so iris
+classification was chosen as a straightforward problem that we were confident GP
+would be able to complete. Furthermore, we hope to explore the specific
+advantages GP has over other approaches, and tackle an application where GP
+isn’t just a good option, but is in fact the best option. More complex
+applications may also require us to use a broader function set—bringing in
+boolean and looping functions—as well as a broader terminal set—looking at zero
+arity functions like `go_left`, perhaps for a pathfinding problem [X].
+
 ## Bibliography
 
 [1] W. Banzhaf, “Artificial Intelligence: Genetic Programming,” International
