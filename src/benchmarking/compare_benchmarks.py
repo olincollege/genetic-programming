@@ -13,8 +13,8 @@ def compare_gp_benchmarks():
     COLORS = {"Python": "#306998", "Swift": "#F05138"}
 
     # Load benchmark data
-    python_data = pd.read_csv("../data/benchmarking/python_gp_benchmarks.csv")
-    swift_data = pd.read_csv("../data/benchmarking/swift_gp_benchmarks.csv")
+    python_data = pd.read_csv("../../data/benchmarking/python_gp_benchmarks.csv")
+    swift_data = pd.read_csv("../../data/benchmarking/swift_gp_benchmarks.csv")
 
     # Add language identifiers and combine datasets
     python_data["language"] = "Python"
@@ -72,7 +72,7 @@ def compare_gp_benchmarks():
         weight="bold",
     )
     plt.tight_layout(rect=[0, 0, 1, 0.95])
-    plt.savefig("../docs/img/benchmarking/gp_runtime_comparison.png")
+    plt.savefig("../../docs/img/benchmarking/gp_runtime_comparison.png")
 
     # Accuracy comparison graph
     plt.figure(figsize=(16, 8))
@@ -121,7 +121,7 @@ def compare_gp_benchmarks():
         weight="bold",
     )
     plt.tight_layout(rect=[0, 0, 1, 0.95])
-    plt.savefig("../docs/img/benchmarking/gp_accuracy_comparison.png")
+    plt.savefig("../../docs/img/benchmarking/gp_accuracy_comparison.png")
 
     # Print summary statistics
     print("\nPerformance Summary:")
@@ -131,8 +131,8 @@ def compare_gp_benchmarks():
     print(f"Swift average accuracy: {swift_data['accuracy'].mean():.3f}")
 
     print("\nVisualization files created:")
-    print("- ../docs/img/benchmarking/gp_runtime_comparison.png")
-    print("- ../docs/img/benchmarking/gp_accuracy_comparison.png")
+    print("- ../../docs/img/benchmarking/gp_runtime_comparison.png")
+    print("- ../../docs/img/benchmarking/gp_accuracy_comparison.png")
 
 
 if __name__ == "__main__":

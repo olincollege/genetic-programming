@@ -22,7 +22,7 @@ def run_benchmarks():
     print("Running Python GP benchmarks...\n")
 
     # Load iris dataset
-    iris = pd.read_csv("../data/Iris.csv")
+    iris = pd.read_csv("../../data/Iris.csv")
     train_df, test_df = train_test_split(iris, test_size=0.3, random_state=3)
 
     # Configuration for benchmarks
@@ -114,10 +114,12 @@ def run_benchmarks():
     # Save results to CSV
     try:
         results_df = pd.DataFrame(results)
-        results_df.to_csv("../data/benchmarking/python_gp_benchmarks.csv", index=False)
+        results_df.to_csv(
+            "../../data/benchmarking/python_gp_benchmarks.csv", index=False
+        )
 
         # Ensure output directory exists
-        os.makedirs("../docs/img", exist_ok=True)
+        os.makedirs("../../docs/img", exist_ok=True)
 
         # Get filtered data
         pop_results = results_df[results_df["parameter"] == "Population Size"]
@@ -156,7 +158,7 @@ def run_benchmarks():
 
         plt.suptitle("Python Genetic Programming: Runtime Performance", fontsize=14)
         plt.tight_layout()
-        plt.savefig("../docs/img/python_benchmarks.png")
+        plt.savefig("../../docs/img/python_benchmarks.png")
         plt.close()
 
         # Plot accuracy results
@@ -192,7 +194,7 @@ def run_benchmarks():
 
         plt.suptitle("Python Genetic Programming: Classification Accuracy", fontsize=14)
         plt.tight_layout()
-        plt.savefig("../docs/img/python_accuracy.png")
+        plt.savefig("../../docs/img/python_accuracy.png")
         plt.close()
 
     except Exception as e:
@@ -205,8 +207,8 @@ if __name__ == "__main__":
     benchmark_results = run_benchmarks()
     if benchmark_results is not None:
         print(
-            "\nBenchmark results saved to '../data/benchmarking/python_gp_benchmarks.csv'"
+            "\nBenchmark results saved to '../../data/benchmarking/python_gp_benchmarks.csv'"
         )
         print("Benchmark plots saved to:")
-        print("- '../docs/img/benchmarking/python_benchmarks.png' (Runtime)")
-        print("- '../docs/img/benchmarking/python_accuracy.png' (Accuracy)")
+        print("- '../../docs/img/benchmarking/python_benchmarks.png' (Runtime)")
+        print("- '../../docs/img/benchmarking/python_accuracy.png' (Accuracy)")
