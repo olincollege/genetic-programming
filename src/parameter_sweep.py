@@ -139,13 +139,13 @@ class ParameterSweep:
             plt.show()
 
     @staticmethod
-    def load_from_csv(results_path: str, param_grid: dict) -> pd.DataFrame:
+    def load_from_csv(path: str, param_grid: dict) -> pd.DataFrame:
         """
         Load parameter sweep results from CSV files and concatenate into a
         single DataFrame.
 
         Args:
-            results_path: Path to the directory containing the CSV files.
+            path: Path to the directory containing the CSV files.
             param_grid: Dictionary of parameters to sweep. Keys include
                 population_size, generations, crossover_rate, mutation_rate,
                 champion_survival_percentage, and max_depth. Values are the
@@ -153,6 +153,6 @@ class ParameterSweep:
         """
         out = pd.DataFrame()
         for param_name in param_grid.keys():
-            df = pd.read_csv(f"{results_path}/param_sweep_{param_name}.csv")
+            df = pd.read_csv(f"{path}/param_sweep_{param_name}.csv")
             out = pd.concat([out, df])
         return out
