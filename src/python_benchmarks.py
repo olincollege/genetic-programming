@@ -114,7 +114,7 @@ def run_benchmarks():
     # Save results to CSV
     try:
         results_df = pd.DataFrame(results)
-        results_df.to_csv("../data/python_gp_benchmarks.csv", index=False)
+        results_df.to_csv("../data/benchmarking/python_gp_benchmarks.csv", index=False)
 
         # Ensure output directory exists
         os.makedirs("../docs/img", exist_ok=True)
@@ -204,7 +204,9 @@ def run_benchmarks():
 if __name__ == "__main__":
     benchmark_results = run_benchmarks()
     if benchmark_results is not None:
-        print("\nBenchmark results saved to '../data/python_gp_benchmarks.csv'")
+        print(
+            "\nBenchmark results saved to '../data/benchmarking/python_gp_benchmarks.csv'"
+        )
         print("Benchmark plots saved to:")
-        print("- '../docs/img/python_benchmarks.png' (Runtime)")
-        print("- '../docs/img/python_accuracy.png' (Accuracy)")
+        print("- '../docs/img/benchmarking/python_benchmarks.png' (Runtime)")
+        print("- '../docs/img/benchmarking/python_accuracy.png' (Accuracy)")

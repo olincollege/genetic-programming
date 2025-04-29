@@ -13,8 +13,8 @@ def compare_gp_benchmarks():
     COLORS = {"Python": "#306998", "Swift": "#F05138"}
 
     # Load benchmark data
-    python_data = pd.read_csv("../data/python_gp_benchmarks.csv")
-    swift_data = pd.read_csv("../data/swift_gp_benchmarks.csv")
+    python_data = pd.read_csv("../data/benchmarking/python_gp_benchmarks.csv")
+    swift_data = pd.read_csv("../data/benchmarking/swift_gp_benchmarks.csv")
 
     # Add language identifiers and combine datasets
     python_data["language"] = "Python"

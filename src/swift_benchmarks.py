@@ -6,7 +6,7 @@ import os
 def visualize_swift_benchmarks():
     """Generate visualization graphs for Swift genetic programming benchmarks"""
     # Load Swift benchmark data
-    swift_data = pd.read_csv("../data/swift_gp_benchmarks.csv")
+    swift_data = pd.read_csv("../data/benchmarking/swift_gp_benchmarks.csv")
 
     # Ensure the output directory exists
     os.makedirs("../docs/img/benchmarking", exist_ok=True)
