@@ -43,7 +43,7 @@ the evolved expression.
 ### Parse Tree Implementation
 
 This section discusses the implementation in
-[`src/parse_tree.py`](src/parse_tree.py).
+[`python/parse_tree.py`](python/parse_tree.py).
 
 #### Node Structure
 
@@ -108,7 +108,7 @@ evaluated as 4 + (-1). (4) an output value of 3 is calculated.
 ### GP Algorithm
 
 This section discusses the implementation in
-[`src/genetic_programming.py`](src/genetic_programming.py).
+[`python/genetic_programming.py`](python/genetic_programming.py).
 
 The genetic programming algorithm performs the following steps:
 
@@ -201,7 +201,7 @@ depth.
 ## Results
 
 Results and graphs generated and reproducible in
-[`src/main.ipynb`](src/main.ipynb).
+[`python/main.ipynb`](python/main.ipynb).
 
 The genetic programming algorithm was run for 50 generations, using
 `random.seed(2)` for reproducibility. The fittest program from this evolution
@@ -281,7 +281,7 @@ chosen to swept. These values are:
 ## Analysis
 
 Results and graphs generated and reproducible in
-[`src/main.ipynb`](src/main.ipynb).
+[`python/main.ipynb`](python/main.ipynb).
 
 To further analyze which versicolors were incorrectly classified as virginicas,
 we plotted all irises of the test set by petal and by sepal dimension. Points
