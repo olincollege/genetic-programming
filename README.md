@@ -4,6 +4,32 @@ Enricco Gemha, Ian Lum, Sally Lee
 
 Final project for Advanced Algorithms, exploring genetic programming
 
+## Repo Overview
+
+```
+genetic-programming/
+├── data/
+│   ├── benchmarking/
+│   ├── param_sweep/
+├── docs
+│   ├── img/
+│   ├── swift.md
+├── Python
+│   ├── benchmarking
+│   │   ├── compare_benchmarks.py
+│   │   ├── python_benchmarks.py
+│   │   ├── swift_benchmarks.py
+│   ├── genetic_programming.py
+│   ├── parameter_sweep.py
+│   ├── parse_tree.py
+│   ├── visualizations.py
+│   ├── main.ipynb
+│   ├── data_visualizations.ipynb
+├── Swift
+│   ├── main.swift
+
+```
+
 ## Background of Algorithm
 
 Genetic programming (GP) applies the principles of biological evolution to
