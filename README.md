@@ -6,7 +6,7 @@ Final project for Advanced Algorithms, exploring genetic programming
 
 ## Background of Algorithm
 
-Genetic programming(GP) applies the principles of biological evolution to
+Genetic programming (GP) applies the principles of biological evolution to
 generate computer programs [1]. GP follows the Darwinian survival of the
 fittest, as well as utilizing genetic operations like random mutation and
 crossover as it evolves over multiple generations.
@@ -38,9 +38,12 @@ the evolved expression.
 
 ## How It Works
 
-### Parse tree implementation
+### Parse Tree Implementation
 
-#### Node structure
+This section discusses the implementation in
+[`src/parse_tree.py`](src/parse_tree.py).
+
+#### Node Structure
 
 We wrote our own implementation of parse trees that were able to be randomly
 generated from a function set and terminal (leaf node) generation rules.
@@ -52,15 +55,16 @@ errors, and thus was not used.
 
 The terminal or leaf nodes are randomized given a set of rules, these being:
 
-- literals: A set of literals, either variables like X or Y, or specific numbers
-- constants_range: A tuple range from which numbers can be randomly selected
+- `literals`: A set of literals, either variables like X or Y, or specific
+  numbers
+- `constants_range`: A tuple range from which numbers can be randomly selected
   from
-- ints_only: A boolean controlling whether randomly generated constants can have
-  fractional values
-- no_random_constants: A boolean controlling whether randomly generated
+- `ints_only`: A boolean controlling whether randomly generated constants can
+  have fractional values
+- `no_random_constants`: A boolean controlling whether randomly generated
   constants are included at all.
-- decimal_places: The number of decimal places for randomly generated constants,
-  defaults to 4.
+- `decimal_places`: The number of decimal places for randomly generated
+  constants, defaults to 4.
 
 For each terminal node, it has an equal chance of choosing from any of the
 literals and randomly generating a constant. For example, if the literals are
@@ -68,8 +72,6 @@ literals and randomly generating a constant. For example, if the literals are
 and 1/3 chance of generating a random constant.
 
 #### Tree generation
-
-![Full Tree Generation](docs/img/full_tree_generation.png)[3]
 
 Parse trees can either be generated with the “full” or “grow” method. With the
 “full” method, the resulting parse tree is guaranteed to be a full tree at a
@@ -79,17 +81,32 @@ before the max depth. This chance is given by the terminal_prob argument.
 Note: The root node is defined to be at depth 0, with the children of the root
 note being depth 1. Thus, the trees in the diagrams above are depth 2 trees.
 
+Full tree generation:
+
+<img src="docs/img/tree_generation_full.png" alt="Full Tree Generation" width="500">
+
+Grow tree generation:
+
+<img src="docs/img/tree_generation_grow.png" alt="Grow Tree Generation" width="500">
+
+Diagrams from Langdon et al. [3]
+
 #### Tree evaluation
 
 To evaluate a parse tree, a dictionary mapping variables to numeric values is
 taken as input. Nodes evaluate their values recursively, with the base case
 being terminal nodes that simply return their numeric value.
-![Tree Evaluation](docs/img/tree_evaluation.png) An example parse tree
-evaluation. (1) variables are mapped to their numeric values. (2) the
-subtraction node is evaluated as 2-3. (3) the addition node is evaluated as 4 +
-(-1). (4) an output value of 3 is calculated.
+
+<img src="docs/img/tree_evaluation.png" alt="Tree Evaluation" width="500">
+
+An example parse tree evaluation. (1) variables are mapped to their numeric
+values. (2) the subtraction node is evaluated as 2-3. (3) the addition node is
+evaluated as 4 + (-1). (4) an output value of 3 is calculated.
 
 ### GP Algorithm
+
+This section discusses the implementation in
+[`src/genetic_programming.py`](src/genetic_programming.py).
 
 The genetic programming algorithm performs the following steps:
 
@@ -166,7 +183,8 @@ other parent. Note that this can result in a tree that exceeds the max depth.
 Crossover is not guaranteed to happen, and is dictated by the variable
 crossover_rate, which we have set to 0.9. If crossover doesn’t occur, the
 offspring is simply a copy of one of the parents.
-![Crossover](docs/img/crossover.png)
+
+<img src="docs/img/crossover.png" alt="Crossover" width="500">
 
 #### Mutation
 
@@ -174,15 +192,20 @@ Champions and offspring all have a chance to mutate, dictated by the variable
 mutation_rate, which we have set to 0.1. To mutate a parse tree, a subtree on
 the parse tree is randomly replaced by a new randomly generated parse tree.
 Similarly to crossover, this operation can result in a tree that exceeds the max
-depth. ![Mutation](docs/img/mutation.png)
+depth.
+
+<img src="docs/img/mutation.png" alt="Mutation" width="500">
 
 ## Results
+
+Results and graphs generated and reproducible in
+[`src/main.ipynb`](src/main.ipynb).
 
 The genetic programming algorithm was run for 50 generations, using
 `random.seed(2)` for reproducibility. The fittest program from this evolution
 was the following tree:
 
-![Best Tree](docs/img/best_tree.png)
+<img src="docs/img/best_tree.png" alt="Best Tree" width="600">
 
 This parse tree had an accuracy of 93% and the following classification report:
 
@@ -199,7 +222,7 @@ This parse tree had an accuracy of 93% and the following classification report:
 To further visualize the how well each species was classified, the results are
 plotted in a confusion matrix:
 
-![Confusion Matrix](docs/img/confusion_matrix.png)
+<img src="docs/img/confusion_matrix.png" alt="Confusion Matrix" width="500">
 
 Looking at the confusion matrix, we see again that the program properly
 classified all setosas and virginicas, but misclassified two versicolors as
@@ -255,6 +278,9 @@ chosen to swept. These values are:
 
 ## Analysis
 
+Results and graphs generated and reproducible in
+[`src/main.ipynb`](src/main.ipynb).
+
 To further analyze which versicolors were incorrectly classified as virginicas,
 we plotted all irises of the test set by petal and by sepal dimension. Points
 are colored based on the species that the best program predicted them to be. The
@@ -265,12 +291,12 @@ When looking at petal dimension, we can see that the two versicolors that were
 incorrectly classified as virginicas are towards the cluster of other
 virginicas.
 
-![Predicted Species by Petal Dimensions](docs/img/predicted_species_petal.png)
+<img src="docs/img/predicted_species_petal.png" alt="Predicted Species by Petal Dimensions" width="500">
 
 When looking at sepal dimension, we can see that the two misclassified
 versicolors are actually within the cluster of virginicas.
 
-![Predicted Species by Sepal Dimensions](docs/img/predicted_species_sepal.png)
+<img src="docs/img/predicted_species_sepal.png" alt="Predicted Species by Sepal Dimensions" width="500">
 
 From these results, we were able to make sure that our program is not only
 performing well just in terms of the accuracy score but the predictions made
@@ -278,7 +304,7 @@ sense even visually.
 
 ### Parameter Sweep Analysis
 
-![Sweep Population Size](docs/img/sweep_population_size.png)
+<img src="docs/img/sweep_population_size.png" alt="Sweep Population Size" width="500">
 
 The first sweep was on the population size from 20 populations to 100, it
 roughly showed a stable increase in accuracy from about 0.85 to about 0.95. We
@@ -286,7 +312,7 @@ can see that increased population size leads to increased accuracy, an
 understandable result as a larger population gives a higher chance to evolve a
 successful program.
 
-![Sweep Generations](docs/img/sweep_generations.png)
+<img src="docs/img/sweep_generations.png" alt="Sweep Generations" width="500">
 
 The second sweep was on the number of generations from 10 to 70. We see large
 initial increase in accuracy, from around 0.85 to 0.95, between 10 and 30
@@ -297,7 +323,7 @@ This similarly makes sense as more generations allow for more chance to evolve a
 successful program, but it may begin to see diminishing returns as the
 population converges on a solution.
 
-![Sweep Crossover Rate](docs/img/sweep_crossover_rate.png)
+<img src="docs/img/sweep_crossover_rate.png" alt="Sweep Crossover Rate" width="500">
 
 The third sweep examined the effect of modifying the crossover rate from 0.6 to
 1.0. There was a continued improvement in accuracy as the crossover rate
@@ -310,7 +336,7 @@ with our intuition and our initial research that crossover helps exploration of
 better solutions, but it also suggests that there is a need to balance crossover
 and mutation so that over-exploration and loss of diversity are avoided.
 
-![Sweep Mutation Rate](docs/img/sweep_mutation_rate.png)
+<img src="docs/img/sweep_mutation_rate.png" alt="Sweep Mutation Rate" width="500">
 
 The fourth sweep experimented with the effect of altering the mutation rate from
 0.0 to 0.1. We observed that accuracy was highest when mutation rate was lowest
@@ -320,7 +346,7 @@ process then helping to explore a wider solution space. This may be because our
 classification had a fairly straightforward solution, and didn't have many local
 optima that mutation would help escape from.
 
-![Sweep Champion Survival](docs/img/sweep_champion_survival_percentage.png)
+<img src="docs/img/sweep_champion_survival_percentage.png" alt="Sweep Champion Survival" width="500">
 
 The fifth sweep examined the effect of altering the champion survival percentage
 from 0.0 to 0.5. Interestingly, the findings showed some fluctuation rather than
@@ -333,7 +359,7 @@ and improve performance, but too little or poorly tuned survival percentages can
 be detrimental. Overall, the findings indicate that accurate tuning of champion
 survival is necessary for optimal performance.
 
-![Sweep Max Depth](docs/img/sweep_max_depth.png)
+<img src="docs/img/sweep_max_depth.png" alt="Sweep Max Depth" width="500">
 
 The sixth and our last sweep took into account the maximum depth of trees
 ranging from 1 to 4. As the maximum depth increased from 1 to 3, the accuracy
@@ -361,7 +387,7 @@ This comparative implementation made clear how Swift's protocols versus Python's
 class inheritance led to slightly different approaches for handling genetic
 operations. The high-level structure of each implementation can be seen below:
 
-![Diagram of the GP implementation in Python and Swift](docs/img/diagram_swift_python.png)
+<img src="docs/img/diagram_swift_python.png" alt="Diagram of the GP implementation in Python and Swift" width="500">
 
 Some of the key implementations made in the Swift version were enabling
 polymorphic behavior between `FunctionNode` and `TerminalNode`. Another
@@ -386,7 +412,7 @@ selecting the class corresponding to the tree that produced the highest
 confidence score, effectively letting the classifiers "vote" on the most likely
 species. This approach simplifies the evolutionary process by transforming a
 complex three-way classification problem into three more manageable binary
-classification tasks.
+classification tasks [5].
 
 #### Performance Benchmarks
 
@@ -430,7 +456,7 @@ using a multi tree approach, the two approaches were primarily compared in terms
 of runtime. A more in depth parameter sweeping of both approaches could reveal
 strengths and weaknesses of either approach, as well as how ideal parameters
 might differ between the two. Furthermore, Espejo et al. details many different
-classification techniques for GP that we could explore [X].
+classification techniques for GP that we could explore [6].
 
 ### More Complex Applications
 
@@ -442,7 +468,7 @@ advantages GP has over other approaches, and tackle an application where GP
 isn’t just a good option, but is in fact the best option. More complex
 applications may also require us to use a broader function set—bringing in
 boolean and looping functions—as well as a broader terminal set—looking at zero
-arity functions like `go_left`, perhaps for a pathfinding problem [X].
+arity functions like `go_left`, perhaps for a pathfinding problem [3].
 
 ## Bibliography
 
@@ -462,3 +488,12 @@ doi:10.1007/978-3-540-78293-3_22
 Genetic Algorithms,
 https://www.obitko.com/tutorials/genetic-algorithms/recommendations.php
 (accessed Apr. 28, 2025).
+
+[5] C. C. Bojarczuk, H. S. Lopes, and A. A. Freitas, “Genetic programming for
+knowledge discovery in chest-pain diagnosis,” IEEE Engineering in Medicine and
+Biology Magazine, vol. 19, no. 4, pp. 38–44, 2000. doi:10.1109/51.853480
+
+[6] P. G. Espejo, S. Ventura, and F. Herrera, “A Survey on the Application of
+Genetic Programming to Classification,” IEEE Transactions on Systems, Man, and
+Cybernetics, Part C (Applications and Reviews), vol. 40, no. 2, pp. 121–144,
+Mar. 2010. doi:10.1109/tsmcc.2009.2033566
