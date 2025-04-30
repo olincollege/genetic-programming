@@ -1,7 +1,10 @@
+"""
+Contains class for performing and visualizing parameter sweeps for the GP model.
+"""
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import accuracy_score
 
 from genetic_programming import IrisGP
 from parse_tree import TerminalGenerationRules
@@ -84,7 +87,8 @@ class ParameterSweep:
             params[param_name] = val
 
             accuracies = []
-            for _ in range(iterations):  # multiple trials for averaging
+            # Run multiple trials for averaging
+            for _ in range(iterations):
                 gp = IrisGP(
                     params["function_set"],
                     params["terminal_rules"],
@@ -101,7 +105,6 @@ class ParameterSweep:
                 )
                 acc = IrisGP.evaluate_fitness(best_tree, test_df) / len(test_df)
                 accuracies.append(acc)
-                # print(f"Accuracy: {acc}")
 
             avg_acc = sum(accuracies) / len(accuracies)
             results.append({"param": param_name, "value": val, "accuracy": avg_acc})
