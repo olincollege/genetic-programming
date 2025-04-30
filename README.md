@@ -11,36 +11,40 @@ genetic-programming/
 ├── data/
 │   ├── benchmarking/
 │   ├── param_sweep/
-├── docs
-│   ├── img/
-├── Python
-│   ├── benchmarking
+│   ├── Iris.csv
+├── img/
+├── Python/
+│   ├── benchmarking/
 │   │   ├── compare_benchmarks.py
 │   │   ├── python_benchmarks.py
 │   │   ├── swift_benchmarks.py
+│   ├── data_visualizations.ipynb
 │   ├── genetic_programming.py
+│   ├── main.ipynb
 │   ├── parameter_sweep.py
 │   ├── parse_tree.py
 │   ├── visualizations.py
-│   ├── main.ipynb
-│   ├── data_visualizations.ipynb
-├── Swift
+├── Swift/
 │   ├── main.swift
 │   ├── swift.md
-
 ```
 
-To run the code, run the `main.ipynb` notebook in the `Python` directory. This
-will run the genetic programming algorithm on the iris dataset, and generate
-visualizations of the results. The `main.swift` file in the `Swift` directory
-can be run to run the genetic programming algorithm in Swift. Please refer to
-the `main.swift` file for more information on the code structure. The `data`
-directory contains the iris dataset, as well as the results of the parameter
-sweep and benchmarking runs. The `docs` directory contains the images used in
-the report. The `data_visualizations.ipynb` file in the `Python` directory
-contains visualizations of the iris dataset, including scatter plots of the
-features. The `benchmarking` directory contains the code to run the benchmarking
-experiments.
+- `data/`: Contains the iris dataset, as well as the results of the parameter
+  sweep and benchmarking runs.
+- `img/`: Contains images used in the report, including results of benchmarking
+  parameter sweep
+- `Python/`
+  - `main.ipynb`: Main file to run the genetic programming algorithm, as well as
+    generate visualizations of the results.
+  - `data_visualizations.ipynb`: Visualizations of the iris dataset, to gain a
+    better understanding of the data.
+  - `genetic_programming.py`, `parse_tree.py`: Implementation of the genetic
+    programming algorithm and parse tree data structure.
+  - `parameter_sweep.py`, `visualizations.py`: Code for visualization and
+    analysis of results.
+  - `benchmarking/`: Code to run the benchmarking experiments.
+- `Swift/`: Contains the Swift implementation of the genetic programming and
+  documentation.
 
 ## Background of Algorithm
 
