@@ -348,7 +348,7 @@ virginicas.
 When looking at sepal dimension, we can see that the two misclassified
 versicolors are actually within the cluster of virginicas.
 
-<img src="img/param_sweep/predicted_species_sepal.png" alt="Predicted Species by Sepal Dimensions" width="700">
+<img src="img/predicted_species_sepal.png" alt="Predicted Species by Sepal Dimensions" width="700">
 
 From these results, we were able to make sure that our program is not only
 performing well just in terms of the accuracy score but the predictions made
