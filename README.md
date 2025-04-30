@@ -4,6 +4,14 @@ Enricco Gemha, Ian Lum, Sally Lee
 
 Final project for Advanced Algorithms, exploring genetic programming
 
+## Setup
+
+All required Python packages are in `requirements.txt`. To install them, run:
+
+```
+pip install -r requirements.txt
+```
+
 ## Repo Overview
 
 ```
