@@ -9,7 +9,7 @@ def visualize_swift_benchmarks():
     swift_data = pd.read_csv("../../data/benchmarking/swift_gp_benchmarks.csv")
 
     # Ensure the output directory exists
-    os.makedirs("../../docs/img/benchmarking", exist_ok=True)
+    os.makedirs("../../img/benchmarking", exist_ok=True)
 
     try:
         # Plot runtime results
@@ -47,7 +47,7 @@ def visualize_swift_benchmarks():
 
         plt.suptitle("Swift Genetic Programming: Runtime Performance", fontsize=14)
         plt.tight_layout()
-        plt.savefig("../../docs/img/benchmarking/swift_benchmarks.png")
+        plt.savefig("../../img/benchmarking/swift_benchmarks.png")
         plt.close()
 
         # Plot accuracy results (as a bonus)
@@ -83,15 +83,11 @@ def visualize_swift_benchmarks():
 
         plt.suptitle("Swift Genetic Programming: Classification Accuracy", fontsize=14)
         plt.tight_layout()
-        plt.savefig("../../docs/img/benchmarking/swift_accuracy.png")
+        plt.savefig("../../img/benchmarking/swift_accuracy.png")
 
         print("\nSwift visualizations generated successfully:")
-        print(
-            "- ../../docs/img/benchmarking/swift_benchmarks.png (Runtime Performance)"
-        )
-        print(
-            "- ../../docs/img/benchmarking/swift_accuracy.png (Classification Accuracy)"
-        )
+        print("- ../../img/benchmarking/swift_benchmarks.png (Runtime Performance)")
+        print("- ../../img/benchmarking/swift_accuracy.png (Classification Accuracy)")
 
     except Exception as e:
         print(f"Error creating plots: {str(e)}")

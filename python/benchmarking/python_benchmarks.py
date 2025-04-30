@@ -119,7 +119,7 @@ def run_benchmarks():
         )
 
         # Ensure output directory exists
-        os.makedirs("../../docs/img", exist_ok=True)
+        os.makedirs("../../img", exist_ok=True)
 
         # Get filtered data
         pop_results = results_df[results_df["parameter"] == "Population Size"]
@@ -158,7 +158,7 @@ def run_benchmarks():
 
         plt.suptitle("Python Genetic Programming: Runtime Performance", fontsize=14)
         plt.tight_layout()
-        plt.savefig("../../docs/img/python_benchmarks.png")
+        plt.savefig("../../img/python_benchmarks.png")
         plt.close()
 
         # Plot accuracy results
@@ -194,7 +194,7 @@ def run_benchmarks():
 
         plt.suptitle("Python Genetic Programming: Classification Accuracy", fontsize=14)
         plt.tight_layout()
-        plt.savefig("../../docs/img/python_accuracy.png")
+        plt.savefig("../../img/python_accuracy.png")
         plt.close()
 
     except Exception as e:
@@ -210,5 +210,5 @@ if __name__ == "__main__":
             "\nBenchmark results saved to '../../data/benchmarking/python_gp_benchmarks.csv'"
         )
         print("Benchmark plots saved to:")
-        print("- '../../docs/img/benchmarking/python_benchmarks.png' (Runtime)")
-        print("- '../../docs/img/benchmarking/python_accuracy.png' (Accuracy)")
+        print("- '../../img/benchmarking/python_benchmarks.png' (Runtime)")
+        print("- '../../img/benchmarking/python_accuracy.png' (Accuracy)")

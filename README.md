@@ -58,7 +58,7 @@ evaluated recursively to produce multivariate expressions. The terminal nodes
 nodes are operators such as addition, multiplication, trigonometry function, and
 more.
 
-![Tree based Genetic Programming](docs/img/tree_based_gp.png)
+![Tree based Genetic Programming](img/tree_based_gp.png)
 
 Genetic programming is classically implemented in Lisp due to its prefix
 notation cleanly being able to represent parse trees [3]. However, for our
@@ -123,11 +123,11 @@ note being depth 1. Thus, the trees in the diagrams above are depth 2 trees.
 
 Full tree generation:
 
-<img src="docs/img/tree_generation_full.png" alt="Full Tree Generation" width="500">
+<img src="img/tree_generation_full.png" alt="Full Tree Generation" width="500">
 
 Grow tree generation:
 
-<img src="docs/img/tree_generation_grow.png" alt="Grow Tree Generation" width="500">
+<img src="img/tree_generation_grow.png" alt="Grow Tree Generation" width="500">
 
 Diagrams from Langdon et al. [3]
 
@@ -137,7 +137,7 @@ To evaluate a parse tree, a dictionary mapping variables to numeric values is
 taken as input. Nodes evaluate their values recursively, with the base case
 being terminal nodes that simply return their numeric value.
 
-<img src="docs/img/tree_evaluation.png" alt="Tree Evaluation" width="600">
+<img src="img/tree_evaluation.png" alt="Tree Evaluation" width="600">
 
 An example parse tree evaluation. (1) variables are mapped to their numeric
 values. (2) the subtraction node is evaluated as 2-3. (3) the addition node is
@@ -224,7 +224,7 @@ Crossover is not guaranteed to happen, and is dictated by the variable
 crossover_rate, which we have set to 0.9. If crossover doesn’t occur, the
 offspring is simply a copy of one of the parents.
 
-<img src="docs/img/crossover.png" alt="Crossover" width="500">
+<img src="img/crossover.png" alt="Crossover" width="500">
 
 #### Mutation
 
@@ -234,7 +234,7 @@ the parse tree is randomly replaced by a new randomly generated parse tree.
 Similarly to crossover, this operation can result in a tree that exceeds the max
 depth.
 
-<img src="docs/img/mutation.png" alt="Mutation" width="500">
+<img src="img/mutation.png" alt="Mutation" width="500">
 
 ## Results
 
@@ -245,7 +245,7 @@ The genetic programming algorithm was run for 50 generations, using
 `random.seed(2)` for reproducibility. The fittest program from this evolution
 was the following tree:
 
-<img src="docs/img/best_tree.png" alt="Best Tree" width="700">
+<img src="img/best_tree.png" alt="Best Tree" width="700">
 
 This parse tree had an accuracy of 93% and the following classification report:
 
@@ -262,7 +262,7 @@ This parse tree had an accuracy of 93% and the following classification report:
 To further visualize the how well each species was classified, the results are
 plotted in a confusion matrix:
 
-<img src="docs/img/confusion_matrix.png" alt="Confusion Matrix" width="600">
+<img src="img/confusion_matrix.png" alt="Confusion Matrix" width="600">
 
 Looking at the confusion matrix, we see again that the program properly
 classified all setosas and virginicas, but misclassified two versicolors as
@@ -331,12 +331,12 @@ When looking at petal dimension, we can see that the two versicolors that were
 incorrectly classified as virginicas are towards the cluster of other
 virginicas.
 
-<img src="docs/img/predicted_species_petal.png" alt="Predicted Species by Petal Dimensions" width="700">
+<img src="img/predicted_species_petal.png" alt="Predicted Species by Petal Dimensions" width="700">
 
 When looking at sepal dimension, we can see that the two misclassified
 versicolors are actually within the cluster of virginicas.
 
-<img src="docs/img/param_sweep/predicted_species_sepal.png" alt="Predicted Species by Sepal Dimensions" width="700">
+<img src="img/param_sweep/predicted_species_sepal.png" alt="Predicted Species by Sepal Dimensions" width="700">
 
 From these results, we were able to make sure that our program is not only
 performing well just in terms of the accuracy score but the predictions made
@@ -344,7 +344,7 @@ sense even visually.
 
 ### Parameter Sweep Analysis
 
-<img src="docs/img/param_sweep/sweep_population_size.png" alt="Sweep Population Size" width="600">
+<img src="img/param_sweep/sweep_population_size.png" alt="Sweep Population Size" width="600">
 
 The first sweep was on the population size from 20 populations to 100, it
 roughly showed a stable increase in accuracy from about 0.85 to about 0.95. We
@@ -352,7 +352,7 @@ can see that increased population size leads to increased accuracy, an
 understandable result as a larger population gives a higher chance to evolve a
 successful program.
 
-<img src="docs/img/param_sweep/sweep_generations.png" alt="Sweep Generations" width="600">
+<img src="img/param_sweep/sweep_generations.png" alt="Sweep Generations" width="600">
 
 The second sweep was on the number of generations from 10 to 70. We see large
 initial increase in accuracy, from around 0.85 to 0.95, between 10 and 30
@@ -363,7 +363,7 @@ This similarly makes sense as more generations allow for more chance to evolve a
 successful program, but it may begin to see diminishing returns as the
 population converges on a solution.
 
-<img src="docs/img/param_sweep/sweep_crossover_rate.png" alt="Sweep Crossover Rate" width="600">
+<img src="img/param_sweep/sweep_crossover_rate.png" alt="Sweep Crossover Rate" width="600">
 
 The third sweep examined the effect of modifying the crossover rate from 0.6 to
 1.0. There was a continued improvement in accuracy as the crossover rate
@@ -376,7 +376,7 @@ with our intuition and our initial research that crossover helps exploration of
 better solutions, but it also suggests that there is a need to balance crossover
 and mutation so that over-exploration and loss of diversity are avoided.
 
-<img src="docs/img/param_sweep/sweep_mutation_rate.png" alt="Sweep Mutation Rate" width="600">
+<img src="img/param_sweep/sweep_mutation_rate.png" alt="Sweep Mutation Rate" width="600">
 
 The fourth sweep experimented with the effect of altering the mutation rate from
 0.0 to 0.1. We observed that accuracy was highest when mutation rate was lowest
@@ -386,7 +386,7 @@ process then helping to explore a wider solution space. This may be because our
 classification had a fairly straightforward solution, and didn't have many local
 optima that mutation would help escape from.
 
-<img src="docs/img/param_sweep/sweep_champion_survival_percentage.png" alt="Sweep Champion Survival" width="600">
+<img src="img/param_sweep/sweep_champion_survival_percentage.png" alt="Sweep Champion Survival" width="600">
 
 The fifth sweep examined the effect of altering the champion survival percentage
 from 0.0 to 0.5. Interestingly, the findings showed some fluctuation rather than
@@ -399,7 +399,7 @@ and improve performance, but too little or poorly tuned survival percentages can
 be detrimental. Overall, the findings indicate that accurate tuning of champion
 survival is necessary for optimal performance.
 
-<img src="docs/img/param_sweep/sweep_max_depth.png" alt="Sweep Max Depth" width="600">
+<img src="img/param_sweep/sweep_max_depth.png" alt="Sweep Max Depth" width="600">
 
 The sixth and our last sweep took into account the maximum depth of trees
 ranging from 1 to 4. As the maximum depth increased from 1 to 3, the accuracy
@@ -427,7 +427,7 @@ This comparative implementation made clear how Swift's protocols versus Python's
 class inheritance led to slightly different approaches for handling genetic
 operations. The high-level structure of each implementation can be seen below:
 
-<img src="docs/img/diagram_swift_python.png" alt="Diagram of the GP implementation in Python and Swift" width="700">
+<img src="img/diagram_swift_python.png" alt="Diagram of the GP implementation in Python and Swift" width="700">
 
 Some of the key implementations made in the Swift version were enabling
 polymorphic behavior between `FunctionNode` and `TerminalNode`. Another
@@ -459,7 +459,7 @@ classification tasks [5].
 We measured the execution time across different population sizes and generation
 counts for both language implementations:
 
-![Genetic Programming Runtime Comparison](docs/img/benchmarking/gp_runtime_comparison.png)
+![Genetic Programming Runtime Comparison](img/benchmarking/gp_runtime_comparison.png)
 
 **Runtime Analysis:**
 
