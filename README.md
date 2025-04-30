@@ -407,9 +407,9 @@ consistently increased to the peak of around 0.93 at depth 3. However, with the
 subsequent increase in the depth to 4, the accuracy fell dramatically to around
 0.87. This trend demonstrates that allowing for deeper trees early on increases
 model expressiveness and leads to better performance, but beyond some point,
-deeper trees can lead to overfitting or unnecessary complexity, ultimately
+deeper trees can lead to over-fitting or unnecessary complexity, ultimately
 hurting generalization. This result aligns with the common intuition that deeper
-structures can capture more complex patterns at the cost of overfitting.
+structures can capture more complex patterns at the cost of over-fitting.
 
 ### Multi-Language Implementation Comparison
 
@@ -508,7 +508,7 @@ advantages GP has over other approaches, and tackle an application where GP
 isn’t just a good option, but is in fact the best option. More complex
 applications may also require us to use a broader function set—bringing in
 boolean and looping functions—as well as a broader terminal set—looking at zero
-arity functions like `go_left`, perhaps for a pathfinding problem [3].
+arity functions like `go_left`, perhaps for a path finding problem [3].
 
 ## Bibliography
 
