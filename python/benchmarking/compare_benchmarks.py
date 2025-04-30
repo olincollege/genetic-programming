@@ -1,3 +1,7 @@
+"""
+Script to visualize Python vs Swift genetic programming benchmarks.
+"""
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns

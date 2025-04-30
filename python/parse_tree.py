@@ -1,5 +1,5 @@
 """
-Parse trees for genetic programming.
+Classes of parse tree data structure for genetic programming.
 """
 
 import random
