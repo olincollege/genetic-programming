@@ -13,7 +13,6 @@ genetic-programming/
 │   ├── param_sweep/
 ├── docs
 │   ├── img/
-│   ├── swift.md
 ├── Python
 │   ├── benchmarking
 │   │   ├── compare_benchmarks.py
@@ -27,8 +26,21 @@ genetic-programming/
 │   ├── data_visualizations.ipynb
 ├── Swift
 │   ├── main.swift
+│   ├── swift.md
 
 ```
+
+To run the code, run the `main.ipynb` notebook in the `Python` directory. This
+will run the genetic programming algorithm on the iris dataset, and generate
+visualizations of the results. The `main.swift` file in the `Swift` directory
+can be run to run the genetic programming algorithm in Swift. Please refer to
+the `main.swift` file for more information on the code structure. The `data`
+directory contains the iris dataset, as well as the results of the parameter
+sweep and benchmarking runs. The `docs` directory contains the images used in
+the report. The `data_visualizations.ipynb` file in the `Python` directory
+contains visualizations of the iris dataset, including scatter plots of the
+features. The `benchmarking` directory contains the code to run the benchmarking
+experiments.
 
 ## Background of Algorithm
 
