@@ -1,0 +1,6 @@
+param,value,accuracy
+mutation_rate,0.0,0.9066666666666668
+mutation_rate,0.005,0.89
+mutation_rate,0.01,0.8533333333333333
+mutation_rate,0.05,0.85
+mutation_rate,0.1,0.8300000000000001
